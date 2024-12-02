@@ -1,0 +1,12 @@
+# Platform-specific files and folders
+.vscode/
+*.dSYM/
+*.exe
+
+# Build artifacts
+build/
+obj/
+
+# User-specific files
+.DS_Store
+Thumbs.db
