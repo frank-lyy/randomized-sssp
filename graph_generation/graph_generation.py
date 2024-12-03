@@ -50,6 +50,13 @@ def construct_constant_degree_graph(G):
         
         # Add edge between the corresponding cycle nodes in G'
         G_prime.add_edge(node_map[(u, v)], node_map[(v, u)], weight=weight)
+    
+    # Save the graph to a file in edge list format
+    with open("constant_degree_graph.txt", "w") as file:
+        file.write(f"{G_prime.number_of_nodes()}\n")
+        for u, v, data in G_prime.edges(data=True):
+            file.write(f"{u} {v} {data['weight']}\n")
+    print("Graph saved to constant_degree_graph.txt")
 
     return G_prime, node_map
 
