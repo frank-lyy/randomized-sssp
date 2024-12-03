@@ -16,7 +16,7 @@ bool ChanceBool(double probabilityTrue) {
 }
 
 //TODO: Change return type, should give data structures for Bundles and Balls
-std::vector<std::pair<double, int>> BundleConstruction(std::vector<std::vector<std::pair<int, double>>> &graph, int src, int k) 
+std::pair<std::unordered_map<int,std::vector<std::pair<double, int>>>,std::unordered_map<int,std::vector<std::pair<double, int>>>> BundleConstruction(std::vector<std::vector<std::pair<int, double>>> &graph, int src, int k) 
 {
     std::unordered_set<int> R {src}; //initialize R_1 with the source node in it
     size_t numNodes = graph.size();
@@ -43,10 +43,16 @@ std::vector<std::pair<double, int>> BundleConstruction(std::vector<std::vector<s
         }
     }
 
+    std::unordered_map<int,std::vector<std::pair<double, int>>> bundle_map;
+    for (const int& key : R) {
+        bundle_map[key] = {}; // Initialize value as an empty vector
+    }
+
     //walk through each V_extract until you find the first node in R
-    for (auto i: V_extract_map) {
-        int start_node = i.first;
-        std::vector<std::pair<double, int>> V_extract = i.second;
+    //build the bundles as we do this
+    for (auto V_extract_pair: V_extract_map) {
+        int start_node = V_extract_pair.first;
+        std::vector<std::pair<double, int>> V_extract = V_extract_pair.second;
         for (size_t i=0; i<V_extract.size(); i++) {
             std::pair<double, int> node = V_extract[i];
             int node_num = node.second;
@@ -55,11 +61,31 @@ std::vector<std::pair<double, int>> BundleConstruction(std::vector<std::vector<s
                 if (i + 1 < V_extract.size()) {
                     V_extract.erase(V_extract.begin() + i + 1, V_extract.end());
                 }
+                //add to bundle_map
+                bundle_map[node_num].push_back({node.first,start_node});
                 break;
             }
 
         }
     }
 
-    //build bundles and balls
+    //build the balls
+    std::unordered_map<int,std::vector<std::pair<double, int>>> ball_map = V_extract_map; //hopefully this isn't aliasing??
+    for (auto i: V_extract_map) {
+        std::vector<std::pair<double, int>> ball = i.second;
+        double dist_to_R = ball[ball.size()-1].first;
+        bool found = false;
+        for (size_t i=ball.size()-2; i>=0; i--) {
+            double distance = ball[i].first;
+            if (distance < dist_to_R) {
+                ball.erase(ball.begin() + i + 1, ball.end());
+                break;
+            }
+        }
+    }
+
+    return {bundle_map,ball_map};
+
+
+    
 }
