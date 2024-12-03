@@ -10,3 +10,6 @@ obj/
 # User-specific files
 .DS_Store
 Thumbs.db
+
+# venv
+venv/
