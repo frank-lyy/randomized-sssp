@@ -50,7 +50,7 @@ std::vector<std::pair<double, int>> DijkstraAlgo(std::vector<std::vector<std::pa
 
 //Dijkstra with a set of nodes R and a limit of nodes it can pop from the queue. Once it reaches this limit, it aborts and returns an empty vector.
 std::vector<std::pair<double, int>> DijkstraAlgoLazy(std::vector<std::vector<std::pair<int, double>>> &graph, int src, std::unordered_set<int> R, int node_limit) {
-    int popped_counter = 0;
+    size_t popped_counter = 0;
     
     size_t numNodes = graph.size();
     // Initialize a vector with size 'numNodes' and all values set to MAX_INT
