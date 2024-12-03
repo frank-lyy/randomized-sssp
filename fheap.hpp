@@ -26,7 +26,6 @@ template <class V> class FibonacciHeap {
 protected:
 	node<V>* heap;
 public:
-
 	FibonacciHeap() {
 		heap=_empty();
 	}
