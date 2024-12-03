@@ -1,6 +1,6 @@
 #include <vector>
 #include <limits>
-#include <./fheap.hpp>
+#include "fheap.hpp"
 using namespace std;
 
 // graph is an adjacency list with edge weights (list of list of pairs adj_node,weight)
@@ -45,8 +45,4 @@ std::vector<std::pair<double, int>> DijkstraAlgo(std::vector<std::vector<std::pa
     return output;
     
     
-}
-
-int main()
-{                        
 }

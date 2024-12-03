@@ -3,12 +3,12 @@
 #include <vector>
 #include <unordered_map>
 
-int main() {
+std::vector<std::vector<std::pair<int, double>>> read_graph() {
     std::ifstream inputFile("graph_generation/small_graph.txt");
-    if (!inputFile.is_open()) {
-        std::cerr << "Error: Could not open file.\n";
-        return 1;
-    }
+    // if (!inputFile.is_open()) {
+    //     std::cerr << "Error: Could not open file.\n";
+    //     return {{{1,1}}};
+    // }
 
     int numNodes;
     inputFile >> numNodes;
@@ -33,5 +33,5 @@ int main() {
         std::cout << "\n";
     }
 
-    return 0;
+    return graph;
 }
