@@ -16,7 +16,7 @@ bool ChanceBool(double probabilityTrue) {
 }
 
 //TODO: Change return type, should give data structures for Bundles and Balls
-std::pair<std::unordered_map<int,std::vector<std::pair<double, int>>>,std::unordered_map<int,std::vector<std::pair<double, int>>>> BundleConstruction(std::vector<std::vector<std::pair<int, double>>> &graph, int src, int k) 
+std::tuple<std::unordered_set<int>,std::vector<std::pair<double,int>>,std::unordered_map<int,std::vector<std::pair<double, int>>>,std::unordered_map<int,std::vector<std::pair<double, int>>>> BundleConstruction(std::vector<std::vector<std::pair<int, double>>> &graph, int src, int k) 
 {
     std::unordered_set<int> R {src}; //initialize R_1 with the source node in it
     size_t numNodes = graph.size();
@@ -43,6 +43,7 @@ std::pair<std::unordered_map<int,std::vector<std::pair<double, int>>>,std::unord
         }
     }
 
+    std::vector<std::pair<double,int>> bundle_parents(numNodes);
     std::unordered_map<int,std::vector<std::pair<double, int>>> bundle_map;
     for (const int& key : R) {
         bundle_map[key] = {}; // Initialize value as an empty vector
@@ -63,6 +64,8 @@ std::pair<std::unordered_map<int,std::vector<std::pair<double, int>>>,std::unord
                 }
                 //add to bundle_map
                 bundle_map[node_num].push_back({node.first,start_node});
+                //add to bundle_parents
+                bundle_parents[start_node] = node;
                 break;
             }
 
@@ -84,7 +87,7 @@ std::pair<std::unordered_map<int,std::vector<std::pair<double, int>>>,std::unord
         }
     }
 
-    return {bundle_map,ball_map};
+    return {R,bundle_parents, bundle_map,ball_map};
 
 
     
