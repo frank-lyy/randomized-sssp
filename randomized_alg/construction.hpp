@@ -21,9 +21,12 @@ std::tuple<std::unordered_set<int>,std::vector<std::pair<double,int>>,std::unord
 {
     std::unordered_set<int> R {src}; //initialize R_1 with the source node in it
     size_t numNodes = graph.size();
-    double chance = 1/k;
+    std::cout << "k (inside construction): " << k << "\n";
+    double chance = 1.0 / k;
+    std::cout << "Chance: " << chance << "\n";
     for (size_t i=0; i<numNodes; i++) {
         if(ChanceBool(chance)) {
+            std::cout << "Randomly selected node: " << i << "\n";
             R.insert(i);
         }
     }
@@ -58,7 +61,7 @@ std::tuple<std::unordered_set<int>,std::vector<std::pair<double,int>>,std::unord
     std::vector<std::pair<double,int>> bundle_parents(numNodes);
     std::unordered_map<int,std::vector<std::pair<double, int>>> bundle_map;
     for (const int& key : R) {
-        bundle_map[key] = {}; // Initialize value as an empty vector
+        bundle_map[key] = {{0,key}}; // Initialize the bundle with itself
     }
 
     //walk through each V_extract until you find the first node in R
