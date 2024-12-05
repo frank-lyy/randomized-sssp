@@ -1,9 +1,12 @@
-#include "../dijkstras.hpp"
 #include "../fheap.hpp"
-#include "construction.hpp"
 #include <limits>
+#include <unordered_set>
+#include <unordered_map>
+#include <vector>
+#include <limits>
+#include <iostream>
 
-void PhaseOneRelax(int node_num, double new_dist, std::unordered_set<int>& R, FibonacciHeap<std::pair<double, int>>& H, std::vector<double> distances, std::vector<node<std::pair<double, int>>*>& pointers) {
+void PhaseOneRelax(int node_num, double new_dist, std::unordered_set<int>& R, FibonacciHeap<std::pair<double, int>>& H, std::vector<double> &distances, std::vector<node<std::pair<double, int>>*>& pointers) {
     if (new_dist < distances[node_num]) {
         distances[node_num] = new_dist;
         if (R.find(node_num) != R.end()) {
@@ -13,7 +16,7 @@ void PhaseOneRelax(int node_num, double new_dist, std::unordered_set<int>& R, Fi
     }
 
 }
-void PhaseTwoRelax(int node_num, double new_dist, std::unordered_set<int>& R, FibonacciHeap<std::pair<double, int>>& H, std::vector<double> distances, std::vector<node<std::pair<double, int>>*>& pointers, std::vector<std::pair<double,int>>& bundle_parents) {
+void PhaseTwoRelax(int node_num, double new_dist, std::unordered_set<int>& R, FibonacciHeap<std::pair<double, int>>& H, std::vector<double> &distances, std::vector<node<std::pair<double, int>>*>& pointers, std::vector<std::pair<double,int>>& bundle_parents) {
     if (new_dist < distances[node_num]) {
         distances[node_num] = new_dist;
         if (R.find(node_num) != R.end()) {

@@ -5,6 +5,7 @@
 #include "../dijkstras.hpp"
 #include <random>
 #include <cmath>
+#include <iostream>
 using namespace std;
 
 bool ChanceBool(double probabilityTrue) {
@@ -34,7 +35,7 @@ std::tuple<std::unordered_set<int>,std::vector<std::pair<double,int>>,std::unord
     //Run dijkstras from every v in V \ R_1, and add in the R_2 nodes to R_1 as you go.
     for (size_t i=0; i< numNodes; i++) {
         if (R.find(i) == R.end()) { //if node i is not in r, run dijkstras
-            std::vector<std::pair<double, int>> V_extract = DijkstraAlgoLazy(graph, src, R, node_limit);
+            std::vector<std::pair<double, int>> V_extract = DijkstraAlgoLazy(graph, i, R, node_limit);
             if(V_extract.empty()) {
                 R.insert(i);
             } else {
@@ -42,6 +43,17 @@ std::tuple<std::unordered_set<int>,std::vector<std::pair<double,int>>,std::unord
             }
         }
     }
+
+    // DEBUG OUTPUT FOR V_extract_map
+    // for (const auto& [key, valueVector] : V_extract_map) {
+    //     std::cout << "Node " << key << ":\n";
+
+    //     // Inner loop: iterate through the vector of pairs
+    //     for (const auto& [distance, destination] : valueVector) {
+    //         std::cout << "  destination: " << destination << ", Distance: " << distance << "\n";
+    //     }
+    // }
+
 
     std::vector<std::pair<double,int>> bundle_parents(numNodes);
     std::unordered_map<int,std::vector<std::pair<double, int>>> bundle_map;
@@ -72,20 +84,49 @@ std::tuple<std::unordered_set<int>,std::vector<std::pair<double,int>>,std::unord
         }
     }
 
+    // DEBUG OUTPUT FOR bundle_map
+    // for (const auto& [key, valueVector] : bundle_map) {
+    //     std::cout << "Parent: " << key << ":\n";
+
+    //     // Inner loop: iterate through the vector of pairs
+    //     for (const auto& [distance, destination] : valueVector) {
+    //         std::cout << "  child: " << destination << ", Distance: " << distance << "\n";
+    //     }
+    // }
+
+    // DEBUG OUTPUT FOR bundle_parents
+    // for (size_t i = 0; i< bundle_parents.size(); i++) {
+    //     const auto& [distance, parent] =bundle_parents[i];
+    //     std::cout << "  child: " << parent << ", Distance: " << distance << "\n";
+    // }
+
     //build the balls
     std::unordered_map<int,std::vector<std::pair<double, int>>> ball_map = V_extract_map; //hopefully this isn't aliasing??
-    for (auto i: V_extract_map) {
-        std::vector<std::pair<double, int>> ball = i.second;
+    for (auto &item: ball_map) {
+        auto& ball = item.second;
         double dist_to_R = ball[ball.size()-1].first;
         bool found = false;
-        for (size_t i=ball.size()-2; i>=0; i--) {
+        for (int i=ball.size()-1; i>=0; i--) {
             double distance = ball[i].first;
             if (distance < dist_to_R) {
+                found = true;
                 ball.erase(ball.begin() + i + 1, ball.end());
                 break;
             }
         }
+        if(!found) {
+            ball.clear(); //TODO: Make a test case for this where every node in the extract map has distance 0, so the ball should be empty
+        }
     }
+
+    //DEBUG OUTPUT FOR ball_map
+    // for (const auto& [key, valueVector] : ball_map) {
+    //     std::cout << "Node " << key << ":\n";
+    //     // Inner loop: iterate through the vector of pairs
+    //     for (const auto& [distance, destination] : valueVector) {
+    //         std::cout << "  destination: " << destination << ", Distance: " << distance << "\n";
+    //     }
+    // }
 
     return {R,bundle_parents, bundle_map,ball_map};
 

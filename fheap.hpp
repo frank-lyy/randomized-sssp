@@ -1,3 +1,5 @@
+#pragma once
+
 template <class V> class FibonacciHeap;
 
 template <class V> struct node {

@@ -70,7 +70,7 @@ std::vector<std::pair<double, int>> DijkstraAlgoLazy(std::vector<std::vector<std
     while (!H.isEmpty()) {
         std::pair<double, int> start_node = H.removeMinimum();
         output.push_back(start_node); //push to our output (distance,node)
-        
+
         //check if the node is in the set R. If so, we have completed this Dijkstra's and we can return
         if (R.find(start_node.second) != R.end()) {
             return output;
