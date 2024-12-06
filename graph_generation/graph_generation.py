@@ -19,46 +19,48 @@ def generate_random_graph(num_nodes, edge_probability):
 
 def construct_constant_degree_graph(G):
     """
-    Constructs G' from G, transforming it into a constant-degree graph while keeping nodes labeled as integers.
-    Node IDs for G' will be continuously increasing integers.
+    Constructs G' from G such that each vertex in G' has degree at most 3.
     :param G: A weighted undirected graph (NetworkX Graph or DiGraph)
-    :return: The transformed graph G' and a mapping from (original_node, neighbor) to new_node_id
+    :return: The transformed graph G'
     """
     G_prime = nx.Graph()  # G' will be an undirected graph
-    next_node_id = max(G.nodes()) + 1  # Start assigning new node IDs after the largest ID in G
     
-    node_map = {}  # Map (v, w) -> new integer node ID for cycle nodes in G'
-
-    # Step 1: Replace each vertex v with a cycle of |N(v)| vertices
+    # Iterate through all nodes in G
     for v in G.nodes():
         neighbors = list(G.neighbors(v))
+        num_neighbors = len(neighbors)
         
-        # Create a new node for each neighbor in the cycle
-        cycle_nodes = []
-        for w in neighbors:
-            node_map[(v, w)] = next_node_id
-            cycle_nodes.append(next_node_id)
-            next_node_id += 1
+        # Create a cycle of |N(v)| vertices for v
+        cycle_nodes = [f"{v}_{w}" for w in neighbors]  # Unique labels for the cycle nodes
+        if num_neighbors == 1:
+            G_prime.add_node(cycle_nodes[0])
+            continue # Skip if v has only one neighbor
+        for i in range(num_neighbors):
+            G_prime.add_edge(cycle_nodes[i], cycle_nodes[(i + 1) % num_neighbors], weight=0)  # Zero-weight cycle
 
-        # Add zero-weight edges to form the cycle
-        for i in range(len(cycle_nodes)):
-            G_prime.add_edge(cycle_nodes[i], cycle_nodes[(i + 1) % len(cycle_nodes)], weight=0)
-
-    # Step 2: Add edges for every edge (u, v) in G
+    # Add edges for each edge in G
     for u, v, data in G.edges(data=True):
         weight = data.get("weight", 1)  # Default weight is 1 if not provided
-        
-        # Add edge between the corresponding cycle nodes in G'
-        G_prime.add_edge(node_map[(u, v)], node_map[(v, u)], weight=weight)
+        G_prime.add_edge(f"{u}_{v}", f"{v}_{u}", weight=weight)  # Connect corresponding cycle nodes
     
+    next_node_id = 0
+    node_mapping = {}
     # Save the graph to a file in edge list format
     with open("constant_degree_graph.txt", "w") as file:
-        file.write(f"{G_prime.number_of_nodes()}\n")
+        file.write(f"{G_prime.number_of_edges()}\n")
         for u, v, data in G_prime.edges(data=True):
+            if u not in node_mapping:
+                node_mapping[u] = next_node_id
+                next_node_id += 1
+            if v not in node_mapping:
+                node_mapping[v] = next_node_id
+                next_node_id += 1
+            u = node_mapping[u]
+            v = node_mapping[v]
             file.write(f"{u} {v} {data['weight']}\n")
     print("Graph saved to constant_degree_graph.txt")
 
-    return G_prime, node_map
+    return G_prime
 
 if __name__ == "__main__":
     num_nodes = 6
