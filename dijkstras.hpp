@@ -18,8 +18,10 @@ std::vector<std::pair<double, int>> DijkstraAlgo(std::vector<std::vector<std::pa
     
     FibonacciHeap<std::pair<double, int>> H;
 
+    
     dijkstras_comparison_counter++;
     for(size_t i = 0; i < distances.size(); ++i) {
+        dijkstras_comparison_counter++;
         dijkstras_arithmetic_op_counter++;
         node<std::pair<double, int>>* pointer = H.insert({distances[i],i});
         pointers[i] = pointer;
@@ -70,8 +72,10 @@ std::vector<std::pair<double, int>> DijkstraAlgoLazy(std::vector<std::vector<std
     
     FibonacciHeap<std::pair<double, int>> H;
 
+    randomized_comparison_counter++;
     for(size_t i = 0; i < distances.size(); ++i) {
         randomized_arithmetic_op_counter++;
+        randomized_comparison_counter++;
         node<std::pair<double, int>>* pointer = H.insert({distances[i],i});
         pointers[i] = pointer;
     }
