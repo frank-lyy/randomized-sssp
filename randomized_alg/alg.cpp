@@ -1,10 +1,18 @@
 #include "construction.hpp"
 #include "bundle_dijkstras.hpp"
+#include "globals.hpp"
 #include "../graph.hpp"
 #include <iostream>
 #include <vector>
 #include <cmath>
 #include <algorithm>
+
+int randomized_comparison_counter = 0;
+int randomized_arithmetic_op_counter = 0;
+
+int dijkstras_comparison_counter = 0;
+int dijkstras_arithmetic_op_counter = 0;
+
 
 int main() {
     std::vector<std::vector<std::pair<int, double>>> graph = read_graph();
