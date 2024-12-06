@@ -13,3 +13,8 @@ Thumbs.db
 
 # venv
 venv/
+
+# large files?
+graph_generation/*.txt
+graph_generation/*.json
+graph_generation/graph.txt

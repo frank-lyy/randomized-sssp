@@ -1,4 +1,30 @@
 #pragma once
+#include "randomized_alg/globals.hpp"
+//TODO: Add comparison counters for randomized and for dijkstras
+
+
+/*Copyright (c) 2010, Robin Message <Robin.Message@cl.cam.ac.uk>
+All rights reserved.
+
+Redistribution and use in source and binary forms, with or without
+modification, are permitted provided that the following conditions are met:
+    * Redistributions of source code must retain the above copyright
+      notice, this list of conditions and the following disclaimer.
+    * Redistributions in binary form must reproduce the above copyright
+      notice, this list of conditions and the following disclaimer in the
+      documentation and/or other materials provided with the distribution.
+    * Neither the name of the Univsersity of Cambridge nor the
+      names of its contributors may be used to endorse or promote products
+      derived from this software without specific prior written permission.
+
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
+ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+DISCLAIMED. IN NO EVENT SHALL THE UNIVERSITY OF CAMBRIDGE OR ROBIN MESSAGE
+BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+(INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+*/
 
 template <class V> class FibonacciHeap;
 
@@ -86,8 +112,14 @@ private:
 	}
 
 	node<V>* _merge(node<V>* a,node<V>* b) {
+		dijkstras_comparison_counter++;
+		randomized_comparison_counter++;
 		if(a==NULL)return b;
+		dijkstras_comparison_counter++;
+		randomized_comparison_counter++;
 		if(b==NULL)return a;
+		dijkstras_comparison_counter++;
+		randomized_comparison_counter++;
 		if(a->value>b->value) {
 			node<V>* temp=a;
 			a=b;
@@ -103,9 +135,13 @@ private:
 	}
 
 	void _deleteAll(node<V>* n) {
+		dijkstras_comparison_counter++;
+		randomized_comparison_counter++;
 		if(n!=NULL) {
 			node<V>* c=n;
 			do {
+				dijkstras_comparison_counter++;
+				randomized_comparison_counter++;
 				node<V>* d=c;
 				c=c->next;
 				_deleteAll(d->child);
@@ -117,14 +153,19 @@ private:
 	void _addChild(node<V>* parent,node<V>* child) {
 		child->prev=child->next=child;
 		child->parent=parent;
+		dijkstras_arithmetic_op_counter++;
 		parent->degree++;
 		parent->child=_merge(parent->child,child);
 	}
 
 	void _unMarkAndUnParentAll(node<V>* n) {
+		dijkstras_comparison_counter++;
+		randomized_comparison_counter++;
 		if(n==NULL)return;
 		node<V>* c=n;
 		do {
+			dijkstras_comparison_counter++;
+			randomized_comparison_counter++;
 			c->marked=false;
 			c->parent=NULL;
 			c=c->next;
@@ -133,6 +174,8 @@ private:
 
 	node<V>* _removeMinimum(node<V>* n) {
 		_unMarkAndUnParentAll(n->child);
+		dijkstras_comparison_counter++;
+		randomized_comparison_counter++;
 		if(n->next==n) {
 			n=n->child;
 		} else {
@@ -140,14 +183,22 @@ private:
 			n->prev->next=n->next;
 			n=_merge(n->next,n->child);
 		}
+		dijkstras_comparison_counter++;
+		randomized_comparison_counter++;
 		if(n==NULL)return n;
 		node<V>* trees[64]={NULL};
 		
 		while(true) {
+			dijkstras_comparison_counter++;
+			randomized_comparison_counter++;
 			if(trees[n->degree]!=NULL) {
 				node<V>* t=trees[n->degree];
+				dijkstras_comparison_counter++;
+				randomized_comparison_counter++;
 				if(t==n)break;
 				trees[n->degree]=NULL;
+				dijkstras_comparison_counter++;
+				randomized_comparison_counter++;
 				if(n->value<t->value) {
 					t->prev->next=t->next;
 					t->next->prev=t->prev;
@@ -155,6 +206,8 @@ private:
 				} else {
 					t->prev->next=t->next;
 					t->next->prev=t->prev;
+					dijkstras_comparison_counter++;
+					randomized_comparison_counter++;
 					if(n->next==n) {
 						t->next=t->prev=t;
 						_addChild(t,n);
@@ -177,6 +230,8 @@ private:
 		node<V>* min=n;
 		node<V>* start=n;
 		do {
+			dijkstras_comparison_counter+=2;
+			randomized_comparison_counter+=2;
 			if(n->value<min->value)min=n;
 			n=n->next;
 		} while(n!=start);
@@ -184,6 +239,8 @@ private:
 	}
 
 	node<V>* _cut(node<V>* heap,node<V>* n) {
+		dijkstras_comparison_counter++;
+		randomized_comparison_counter++;
 		if(n->next==n) {
 			n->parent->child=NULL;
 		} else {
@@ -197,22 +254,36 @@ private:
 	}
 
 	node<V>* _decreaseKey(node<V>* heap,node<V>* n,V value) {
+		dijkstras_comparison_counter++;
+		randomized_comparison_counter++;
 		if(n->value<value)return heap;
 		n->value=value;
+		dijkstras_comparison_counter++;
+		randomized_comparison_counter++;
 		if(n->parent) {
+			dijkstras_comparison_counter++;
+			randomized_comparison_counter++;
 			if(n->value<n->parent->value) {
 				heap=_cut(heap,n);
 				node<V>* parent=n->parent;
 				n->parent=NULL;
+				dijkstras_comparison_counter+=2;
+				randomized_comparison_counter+=2;
 				while(parent!=NULL && parent->marked) {
 					heap=_cut(heap,parent);
 					n=parent;
 					parent=n->parent;
 					n->parent=NULL;
+					dijkstras_comparison_counter+=2;
+					randomized_comparison_counter+=2;
 				}
+				dijkstras_comparison_counter++;
+				randomized_comparison_counter++;
 				if(parent!=NULL && parent->parent!=NULL)parent->marked=true;
 			}
 		} else {
+			dijkstras_comparison_counter++;
+			randomized_comparison_counter++;
 			if(n->value < heap->value) {
 				heap = n;
 			}
@@ -222,12 +293,20 @@ private:
 
 	node<V>* _find(node<V>* heap,V value) {
 		node<V>* n=heap;
+		dijkstras_comparison_counter++;
+		randomized_comparison_counter++;
 		if(n==NULL)return NULL;
 		do {
+			dijkstras_comparison_counter++;
+			randomized_comparison_counter++;
 			if(n->value==value)return n;
 			node<V>* ret=_find(n->child,value);
+			dijkstras_comparison_counter++;
+			randomized_comparison_counter++;
 			if(ret)return ret;
 			n=n->next;
+			dijkstras_comparison_counter++;
+			randomized_comparison_counter++;
 		}while(n!=heap);
 		return NULL;
 	}

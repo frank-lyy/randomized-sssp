@@ -1,31 +1,47 @@
 #include "construction.hpp"
 #include "bundle_dijkstras.hpp"
+#include "globals.hpp"
 #include "../graph.hpp"
 #include <iostream>
 #include <vector>
 #include <cmath>
 #include <algorithm>
 
+int randomized_comparison_counter = 0;
+int randomized_arithmetic_op_counter = 0;
+
+int dijkstras_comparison_counter = 0;
+int dijkstras_arithmetic_op_counter = 0;
+
+
 int main() {
-    std::vector<std::vector<std::pair<int, double>>> graph = read_graph();
+    std::vector<std::vector<std::pair<int, double>>> graph = read_graph(true);
     int n = graph.size();
     std::cout << "graph size: " << n << std::endl;
-    double k = std::max(sqrt(std::log(n)/std::log(std::log(n))), static_cast<double>(n)); //if n is too small, this could give a negative?
+    // double k = std::max(sqrt(std::log(n)/std::log(std::log(n))), static_cast<double>(n)); //if n is too small, this could give a negative?
+    double k = sqrt(std::log(n)/std::log(std::log(n)));
     std::cout << "k: " << k << std::endl;
-    std::tuple<std::unordered_set<int>,std::vector<std::pair<double,int>>,std::unordered_map<int,std::vector<std::pair<double, int>>>,std::unordered_map<int,std::vector<std::pair<double, int>>>> construction = BundleConstruction(graph,0,k);
-    std::unordered_set<int> R = std::get<0>(construction);
-    std::vector<std::pair<double,int>> bundle_parents = std::get<1>(construction);
-    std::unordered_map<int,std::vector<std::pair<double, int>>> bundle_map = std::get<2>(construction);
-    std::unordered_map<int,std::vector<std::pair<double, int>>> ball_map = std::get<3>(construction);
-    std::vector<double> distances = BundleDijkstras(R,bundle_parents,bundle_map,ball_map,graph,0,k);
+    const auto& [R, bundle_parents, bundle_map, ball_map] = BundleConstruction(graph,0,k);
+    const std::vector<double> &distances = BundleDijkstras(R,bundle_parents,bundle_map,ball_map,graph,0,k);
 
     // std::vector<double> distances = std::apply(
     //     [&graph,&k](auto&&... unpackedArgs) { return BundleDijkstras(unpackedArgs..., graph, 0, k); }, //everything passed into dijkstras is empty rn for some reason?
     //     construction
     // );
-    for (size_t i=0; i< n; i++) {
-        std::cout << "Node: " << i << ", Distance: " << distances[i] << std::endl;
+    // for (size_t i=0; i< n; i++) {
+    //     std::cout << "Node: " << i << ", Distance: " << distances[i] << std::endl;
+    // }
+
+    // Create an output file stream
+    std::ofstream outFile("../graph_generation/alg.txt");
+    // Write to the file
+    for (size_t i=0; i<n; i++) {
+        outFile << i << " " << distances[i] << std::endl;  
     }
+    // Close the file
+    outFile.close();
+    // Confirm the operation
+    std::cout << "Randomized SSSP written to output.txt" << std::endl;
 
     return 0;    
 }

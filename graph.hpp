@@ -3,8 +3,14 @@
 #include <vector>
 #include <unordered_map>
 
-inline std::vector<std::vector<std::pair<int, double>>> read_graph() {
-    std::ifstream inputFile("../graph_generation/small_graph.txt");
+inline std::vector<std::vector<std::pair<int, double>>> read_graph(bool constant_degree) {
+    std::string filename;
+    if (constant_degree) {
+        filename = "../graph_generation/constant_degree_graph.txt";
+    } else {
+        filename = "../graph_generation/graph.txt";
+    }
+    std::ifstream inputFile(filename);
     // if (!inputFile.is_open()) {
     //     std::cerr << "Error: Could not open file.\n";
     //     return {{{1,1}}};
@@ -25,13 +31,13 @@ inline std::vector<std::vector<std::pair<int, double>>> read_graph() {
     inputFile.close();
 
     // Print adjacency list
-    for (int i = 0; i < numNodes; i++) {
-        std::cout << "Node " << i << ": ";
-        for (auto neighbor : graph[i]) {
-            std::cout << "(" << neighbor.first << ", " << neighbor.second << ") ";
-        }
-        std::cout << "\n";
-    }
+    // for (int i = 0; i < numNodes; i++) {
+    //     std::cout << "Node " << i << ": ";
+    //     for (auto neighbor : graph[i]) {
+    //         std::cout << "(" << neighbor.first << ", " << neighbor.second << ") ";
+    //     }
+    //     std::cout << "\n";
+    // }
 
     return graph;
 }
