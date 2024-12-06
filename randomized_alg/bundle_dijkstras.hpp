@@ -5,6 +5,8 @@
 #include <vector>
 #include <limits>
 #include <iostream>
+#include <tuple>
+#include <memory> 
 
 void PhaseOneRelax(int node_num, double new_dist, std::unordered_set<int>& R, FibonacciHeap<std::pair<double, int>>& H, std::vector<double> &distances, std::vector<node<std::pair<double, int>>*>& pointers) {
     if (new_dist < distances[node_num]) {
@@ -31,7 +33,12 @@ void PhaseTwoRelax(int node_num, double new_dist, std::unordered_set<int>& R, Fi
     }
 }
 
-std::vector<double> BundleDijkstras(std::unordered_set<int>& R, std::vector<std::pair<double,int>>& bundle_parents, std::unordered_map<int,std::vector<std::pair<double, int>>>& bundle_map,std::unordered_map<int,std::vector<std::pair<double, int>>>& ball_map, std::vector<std::vector<std::pair<int, double>>> &graph, int src, int k) {
+std::vector<double> BundleDijkstras(const std::unique_ptr<std::unordered_set<int>>& R_ptr, const std::unique_ptr<std::vector<std::pair<double,int>>>& bundle_parents_ptr, const std::unique_ptr<std::unordered_map<int,std::vector<std::pair<double, int>>>>& bundle_map_ptr, const std::unique_ptr<std::unordered_map<int,std::vector<std::pair<double, int>>>>& ball_map_ptr, std::vector<std::vector<std::pair<int, double>>> &graph, int src, int k) {
+    auto& R = *R_ptr;
+    auto& bundle_parents = *bundle_parents_ptr;
+    auto& bundle_map = *bundle_map_ptr;
+    auto& ball_map = *ball_map_ptr;
+
     size_t numNodes = graph.size();
     std::vector<double> distances(numNodes, std::numeric_limits<int>::max());
     std::vector<node<std::pair<double, int>>*> pointers(numNodes);

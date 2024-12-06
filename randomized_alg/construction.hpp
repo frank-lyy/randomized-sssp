@@ -6,6 +6,8 @@
 #include <random>
 #include <cmath>
 #include <iostream>
+#include <tuple>
+#include <memory> 
 using namespace std;
 
 bool ChanceBool(double probabilityTrue) {
@@ -17,7 +19,12 @@ bool ChanceBool(double probabilityTrue) {
 }
 
 //TODO: Change return type, should give data structures for Bundles and Balls
-std::tuple<std::unordered_set<int>,std::vector<std::pair<double,int>>,std::unordered_map<int,std::vector<std::pair<double, int>>>,std::unordered_map<int,std::vector<std::pair<double, int>>>> BundleConstruction(std::vector<std::vector<std::pair<int, double>>> &graph, int src, int k) 
+std::tuple<
+    std::unique_ptr<std::unordered_set<int>>,
+    std::unique_ptr<std::vector<std::pair<double, int>>>,
+    std::unique_ptr<std::unordered_map<int, std::vector<std::pair<double, int>>>>,
+    std::unique_ptr<std::unordered_map<int, std::vector<std::pair<double, int>>>>
+> BundleConstruction(std::vector<std::vector<std::pair<int, double>>> &graph, int src, double k) 
 {
     std::unordered_set<int> R {src}; //initialize R_1 with the source node in it
     size_t numNodes = graph.size();
@@ -130,8 +137,11 @@ std::tuple<std::unordered_set<int>,std::vector<std::pair<double,int>>,std::unord
     //         std::cout << "  destination: " << destination << ", Distance: " << distance << "\n";
     //     }
     // }
-
-    return {R,bundle_parents, bundle_map,ball_map};
+    auto R_ptr = std::make_unique<std::unordered_set<int>>(std::move(R));
+    auto bundle_parents_ptr = std::make_unique<std::vector<std::pair<double,int>>>(std::move(bundle_parents));
+    auto bundle_map_ptr = std::make_unique<std::unordered_map<int,std::vector<std::pair<double, int>>>>(std::move(bundle_map));
+    auto ball_map_ptr = std::make_unique<std::unordered_map<int,std::vector<std::pair<double, int>>>>(std::move(ball_map));
+    return std::make_tuple(std::move(R_ptr), std::move(bundle_parents_ptr), std::move(bundle_map_ptr), std::move(ball_map_ptr));
 
 
     
