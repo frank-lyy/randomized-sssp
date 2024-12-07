@@ -56,8 +56,6 @@ std::vector<double> BundleDijkstras(const std::unique_ptr<std::unordered_set<int
         node<std::pair<double, int>>* pointer = H.insert({distances[node_num],node_num});
         pointers[node_num] = pointer;
     }
-    
-    int past_nodes_finished_counter = 0;
 
     randomized_comparison_counter++;
     while (!H.isEmpty()) {
@@ -98,10 +96,6 @@ std::vector<double> BundleDijkstras(const std::unique_ptr<std::unordered_set<int
                 }
             }
         }
-
-        
-        
-        nodes_finished_counter++;
 
         randomized_comparison_counter++;
     }

@@ -11,8 +11,6 @@ int randomized_arithmetic_op_counter = 0;
 int dijkstras_comparison_counter = 0;
 int dijkstras_arithmetic_op_counter = 0;
 
-int nodes_finished_counter = 0;
-
 int main() {
     // std::vector<std::vector<std::pair<int, double>>> graph  = {
     //     // Node 0
