@@ -1,6 +1,5 @@
 #pragma once
 #include "randomized_alg/globals.hpp"
-//TODO: Add comparison counters for randomized and for dijkstras
 
 
 /*Copyright (c) 2010, Robin Message <Robin.Message@cl.cam.ac.uk>
@@ -58,6 +57,8 @@ public:
 		heap=_empty();
 	}
 	virtual ~FibonacciHeap() {
+		dijkstras_comparison_counter++;
+		randomized_comparison_counter++;
 		if(heap) {
 			_deleteAll(heap);
 		}
@@ -154,6 +155,7 @@ private:
 		child->prev=child->next=child;
 		child->parent=parent;
 		dijkstras_arithmetic_op_counter++;
+		randomized_arithmetic_op_counter++;
 		parent->degree++;
 		parent->child=_merge(parent->child,child);
 	}

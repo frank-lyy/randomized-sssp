@@ -3,6 +3,13 @@
 #include "../dijkstras.hpp"
 #include "../graph.hpp"
 #include <unordered_set>
+#include "globals.hpp"
+
+int randomized_comparison_counter = 0;
+int randomized_arithmetic_op_counter = 0;
+
+int dijkstras_comparison_counter = 0;
+int dijkstras_arithmetic_op_counter = 0;
 
 int main() {
     std::vector<std::vector<std::pair<int, double>>> graph = read_graph(false);
@@ -22,6 +29,9 @@ int main() {
     outFile.close();
     // Confirm the operation
     std::cout << "Reference Dijkstra's written to reference.txt" << std::endl;
+
+    std::cout << "Number of comparisons for Dijkstra's: " << dijkstras_comparison_counter << std::endl;
+    std::cout << "Number of arithmetic ops for Dijkstra's: " << dijkstras_arithmetic_op_counter << std::endl;
 
     return 0;    
 }

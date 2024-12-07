@@ -43,5 +43,9 @@ int main() {
     // Confirm the operation
     std::cout << "Randomized SSSP written to output.txt" << std::endl;
 
+    
+    std::cout << "Number of comparisons for Randomized Alg: " << randomized_comparison_counter << std::endl;
+    std::cout << "Number of arithmetic ops for Randomized Alg: " << randomized_arithmetic_op_counter << std::endl;
+
     return 0;    
 }
