@@ -7,6 +7,7 @@ inline std::vector<std::vector<std::pair<int, double>>> read_graph(bool constant
     std::string filename;
     if (constant_degree) {
         filename = "../graph_generation/constant_degree_graph.txt";
+        // filename = "../graph_generation/graph.txt";
     } else {
         filename = "../graph_generation/graph.txt";
     }

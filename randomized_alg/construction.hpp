@@ -9,7 +9,12 @@
 #include <iostream>
 #include <tuple>
 #include <memory> 
+#include <chrono>
 using namespace std;
+using std::chrono::high_resolution_clock;
+using std::chrono::duration_cast;
+using std::chrono::duration;
+using std::chrono::milliseconds;
 
 bool ChanceBool(double probabilityTrue) {
     std::random_device rd;
@@ -27,6 +32,12 @@ std::tuple<
     std::unique_ptr<std::unordered_map<int, std::vector<std::pair<double, int>>>>
 > BundleConstruction(std::vector<std::vector<std::pair<int, double>>> &graph, int src, double k) 
 {
+    // timing things
+    auto t1 = high_resolution_clock::now();
+    auto t2 = high_resolution_clock::now();
+    duration<double, std::milli> ms_double = t2 - t1;
+    
+    t1 = high_resolution_clock::now();
     std::unordered_set<int> R {src}; //initialize R_1 with the source node in it
     size_t numNodes = graph.size();
     std::cout << "k (inside construction): " << k << "\n";
@@ -44,6 +55,9 @@ std::tuple<
         randomized_comparison_counter++;
     }
     std::cout << "Randomly selected " << R.size() << " nodes\n";
+    t2 = high_resolution_clock::now();
+    ms_double = t2 - t1;
+    std::cout << ms_double.count() << "ms to select random nodes" << std::endl;
 
     randomized_arithmetic_op_counter++;
     double node_limit = k * std::log(k); //compute klogk with natural log.
@@ -51,11 +65,18 @@ std::tuple<
     std::unordered_map<int,std::vector<std::pair<double, int>>> V_extract_map;     
 
     //Run dijkstras from every v in V \ R_1, and add in the R_2 nodes to R_1 as you go.
+    t1 = high_resolution_clock::now();
     randomized_comparison_counter++;
-    for (size_t i=0; i< numNodes; i++) {
+    for (size_t i=0; i<numNodes; i++) {
         randomized_comparison_counter++;
         if (R.find(i) == R.end()) { //if node i is not in r, run dijkstras
+            auto _t1 = high_resolution_clock::now();
             std::vector<std::pair<double, int>> V_extract = DijkstraAlgoLazy(graph, i, R, node_limit);
+            if (i % 10000 == 1) {
+                auto _t2 = high_resolution_clock::now();
+                duration<double, std::milli> _ms_double = _t2 - _t1;
+                std::cout << _ms_double.count() << "ms to run dijkstra-algo-lazy\n";
+            }
             randomized_comparison_counter++;
             if(V_extract.empty()) {
                 R.insert(i);
@@ -66,6 +87,9 @@ std::tuple<
         randomized_arithmetic_op_counter++;
         randomized_comparison_counter++;
     }
+    t2 = high_resolution_clock::now();
+    ms_double = t2 - t1;
+    std::cout << ms_double.count() << "ms to run dijkstras\n";
 
     // DEBUG OUTPUT FOR V_extract_map
     // for (const auto& [key, valueVector] : V_extract_map) {
@@ -77,7 +101,7 @@ std::tuple<
     //     }
     // }
 
-
+    t1 = high_resolution_clock::now();
     std::vector<std::pair<double,int>> bundle_parents(numNodes);
     std::unordered_map<int,std::vector<std::pair<double, int>>> bundle_map;
     for (const int& key : R) {
@@ -113,6 +137,9 @@ std::tuple<
 
         }
     }
+    t2 = high_resolution_clock::now();
+    ms_double = t2 - t1;
+    std::cout << ms_double.count() << "ms to build bundles\n";
 
     // DEBUG OUTPUT FOR bundle_map
     // for (const auto& [key, valueVector] : bundle_map) {
@@ -131,6 +158,7 @@ std::tuple<
     // }
 
     //build the balls
+    t1 = high_resolution_clock::now();
     std::unordered_map<int,std::vector<std::pair<double, int>>> ball_map = V_extract_map;
     for (auto &item: ball_map) {
         auto& ball = item.second;
@@ -156,6 +184,9 @@ std::tuple<
             ball.clear(); //TODO: Make a test case for this where every node in the extract map has distance 0, so the ball should be empty
         }
     }
+    t2 = high_resolution_clock::now();
+    ms_double = t2 - t1;
+    std::cout << ms_double.count() << "ms to build balls\n";
 
     //DEBUG OUTPUT FOR ball_map
     // for (const auto& [key, valueVector] : ball_map) {
@@ -165,10 +196,14 @@ std::tuple<
     //         std::cout << "  destination: " << destination << ", Distance: " << distance << "\n";
     //     }
     // }
+    t1 = high_resolution_clock::now();
     auto R_ptr = std::make_unique<std::unordered_set<int>>(std::move(R));
     auto bundle_parents_ptr = std::make_unique<std::vector<std::pair<double,int>>>(std::move(bundle_parents));
     auto bundle_map_ptr = std::make_unique<std::unordered_map<int,std::vector<std::pair<double, int>>>>(std::move(bundle_map));
     auto ball_map_ptr = std::make_unique<std::unordered_map<int,std::vector<std::pair<double, int>>>>(std::move(ball_map));
+    t2 = high_resolution_clock::now();
+    ms_double = t2 - t1;
+    std::cout << ms_double.count() << "ms to make pointers of returns\n";
     return std::make_tuple(std::move(R_ptr), std::move(bundle_parents_ptr), std::move(bundle_map_ptr), std::move(ball_map_ptr));
 
 
