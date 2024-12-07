@@ -5,6 +5,9 @@ import random
 def generate_random_graph(num_nodes, edge_probability):
     # Generate a small random graph
     G = nx.erdos_renyi_graph(n=num_nodes, p=edge_probability, directed=False)  
+    while not nx.is_connected(G):
+        print("Graph is not connected. Generating a new graph...")
+        G = nx.erdos_renyi_graph(n=num_nodes, p=edge_probability, directed=False)
 
     for u, v in G.edges():
         G[u][v]["weight"] = round(random.uniform(1, 10), 2)  # Assign random weights between 1 and 10
@@ -30,41 +33,45 @@ def construct_constant_degree_graph(G):
     # Iterate through all nodes in G
     for v in G.nodes():
         neighbors = list(G.neighbors(v))
-        num_neighbors = len(neighbors)
         
         # Create a cycle of |N(v)| vertices for v
         cycle_nodes = [f"{v}_{w}" for w in neighbors]  # Unique labels for the cycle nodes
+        if len(neighbors) == 0: 
+            cycle_nodes.append(f"{v}_{v}")
+        
+        # Add mappings from cycle nodes to v
         for c in cycle_nodes:
             g_node_mappings[c] = v
-        if num_neighbors == 1:
+        
+        if len(cycle_nodes) == 1:
             G_prime.add_node(cycle_nodes[0])
             continue # Skip if v has only one neighbor
-        for i in range(num_neighbors):
-            G_prime.add_edge(cycle_nodes[i], cycle_nodes[(i + 1) % num_neighbors], weight=0)  # Zero-weight cycle
+        for i in range(len(neighbors)):
+            G_prime.add_edge(cycle_nodes[i], cycle_nodes[(i + 1) % len(neighbors)], weight=0)  # Zero-weight cycle
+    # print(g_node_mappings)
 
     # Add edges for each edge in G
     for u, v, data in G.edges(data=True):
-        weight = data.get("weight", 1)  # Default weight is 1 if not provided
-        G_prime.add_edge(f"{u}_{v}", f"{v}_{u}", weight=weight)  # Connect corresponding cycle nodes
+        # weight = data.get("weight", 1)  # Default weight is 1 if not provided
+        G_prime.add_edge(f"{u}_{v}", f"{v}_{u}", weight=data["weight"])  # Connect corresponding cycle nodes
     
     next_node_id = 0
     node_mapping = {}
     # Save the graph to a file in edge list format
     with open("constant_degree_graph.txt", "w") as file:
         file.write(f"{G_prime.number_of_nodes()}\n")
-        for u, v, data in G_prime.edges(data=True):
+        for u in G_prime.nodes():
             if u not in node_mapping:
                 node_mapping[u] = next_node_id
                 next_node_id += 1
-            if v not in node_mapping:
-                node_mapping[v] = next_node_id
-                next_node_id += 1
+        for u, v, data in G_prime.edges(data=True):
             u = node_mapping[u]
             v = node_mapping[v]
             file.write(f"{u} {v} {data['weight']}\n")
     print("Graph saved to constant_degree_graph.txt")
+    # print(node_mapping)
 
-    g_prime_node_mappings = {node_in_g_prime: str(g_node_mappings[node_in_g_prime_str]) for node_in_g_prime_str, node_in_g_prime in node_mapping.items()}
+    g_prime_node_mappings = {str(node_in_g_prime): str(g_node_mappings[node_in_g_prime_str]) for node_in_g_prime_str, node_in_g_prime in node_mapping.items()}
     with open("node_mappings.json", "w") as file:
         json.dump(g_prime_node_mappings, file)
     print("Mappings saved to node_mappings.json")
@@ -72,7 +79,11 @@ def construct_constant_degree_graph(G):
     return G_prime
 
 if __name__ == "__main__":
-    num_nodes = 10000
+    num_nodes = 100
     edge_probability = 0.1
     G = generate_random_graph(num_nodes, edge_probability)
+    dists = nx.shortest_path_length(G, source=0, weight="weight")
+    with open("true_reference.txt", "w") as file:
+        for node, dist in dists.items():
+            file.write(f"{node} {dist}\n")
     G_prime = construct_constant_degree_graph(G)
