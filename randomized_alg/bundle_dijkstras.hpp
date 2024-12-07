@@ -57,39 +57,29 @@ std::vector<double> BundleDijkstras(const std::unique_ptr<std::unordered_set<int
         pointers[node_num] = pointer;
     }
     
+    int past_nodes_finished_counter = 0;
+
     randomized_comparison_counter++;
     while (!H.isEmpty()) {
-        std::pair<double, int> u = H.removeMinimum();
-        double u_dist = u.first;
-        int u_num = u.second;
+        auto [u_dist, u_num] = H.removeMinimum();
         //phase 1
-        for (const std::pair<double, int>& v : bundle_map[u_num]) {
-            double v_u_dist = v.first;
-            double v_num = v.second;
+        for (const auto& [v_u_dist,v_num] : bundle_map[u_num]) {
             randomized_arithmetic_op_counter++;
             PhaseOneRelax(v_num, u_dist+v_u_dist, R, H, distances, pointers);
 
-            for (const std::pair<double, int>& y : ball_map[v_num]) {
-                double y_v_dist = y.first;
-                double y_num = y.second;
+            for (const auto& [y_v_dist,y_num] : ball_map[v_num]) {
                 randomized_arithmetic_op_counter++;
                 PhaseOneRelax(v_num,distances[y_num]+y_v_dist, R, H, distances, pointers);
             }
 
             //for v
-            for (const std::pair<int, double>& z_1 : graph[v_num]) {
-                int z_1_num = z_1.first;
-                double edge_weight = z_1.second;
+            for (const auto& [z_1_num, edge_weight] : graph[v_num]) {
                 randomized_arithmetic_op_counter++;
                 PhaseOneRelax(v_num,distances[z_1_num]+edge_weight, R, H, distances, pointers);
             }
             //for each z_2 in Ball(v)
-            for (const std::pair<double, int>& z_2 : ball_map[v_num]) {
-                double z_2_v_dist = z_2.first;
-                double z_2_num = z_2.second;
-                for (const std::pair<int, double>& z_1 : graph[z_2_num]) {
-                    int z_1_num = z_1.first;
-                    double edge_weight = z_1.second;
+            for (const auto& [z_2_v_dist,z_2_num] : ball_map[v_num]) {
+                for (const auto& [z_1_num, edge_weight] : graph[z_2_num]) {
                     randomized_arithmetic_op_counter++;
                     PhaseOneRelax(v_num,distances[z_1_num]+edge_weight+z_2_v_dist, R, H, distances, pointers);
                 }
@@ -98,17 +88,11 @@ std::vector<double> BundleDijkstras(const std::unique_ptr<std::unordered_set<int
 
         //phase 2
         //TODO: Once we've figured out correctness and run some tests, can probably optimize this so it skips nodes we've already seen
-        for (const std::pair<double, int>& x : bundle_map[u_num]) {
-            double x_u_dist = x.first;
-            int x_num = x.second;
-            for (const std::pair<int, double>& y : graph[x_num]) {
-                int y_num = y.first;
-                double edge_weight = y.second;
+        for (const auto& [x_u_dist,x_num] : bundle_map[u_num]) {
+            for (const auto& [y_num, edge_weight] : graph[x_num]) {
                 randomized_arithmetic_op_counter++;
                 PhaseTwoRelax(y_num, distances[x_num]+edge_weight, R, H, distances, pointers, bundle_parents);
-                for(const std::pair<double, int>& z_1 : ball_map[y_num]) {
-                    double z_1_y_dist = z_1.first;
-                    int z_1_num = z_1.second;
+                for(const auto& [z_1_y_dist, z_1_num] : ball_map[y_num]) {
                     randomized_arithmetic_op_counter++;
                     PhaseTwoRelax(z_1_num, distances[x_num]+edge_weight+z_1_y_dist, R, H, distances, pointers, bundle_parents);
                 }
@@ -116,6 +100,9 @@ std::vector<double> BundleDijkstras(const std::unique_ptr<std::unordered_set<int
         }
 
         
+        
+        nodes_finished_counter++;
+
         randomized_comparison_counter++;
     }
 
