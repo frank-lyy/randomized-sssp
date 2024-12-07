@@ -20,17 +20,10 @@ int main() {
     std::cout << "graph size: " << n << std::endl;
     // double k = std::max(sqrt(std::log(n)/std::log(std::log(n))), static_cast<double>(n)); //if n is too small, this could give a negative?
     double k = sqrt(std::log(n)/std::log(std::log(n)));
+    // k *= 5;
     std::cout << "k: " << k << std::endl;
     const auto& [R, bundle_parents, bundle_map, ball_map] = BundleConstruction(graph,0,k);
     const std::vector<double> &distances = BundleDijkstras(R,bundle_parents,bundle_map,ball_map,graph,0,k);
-
-    // std::vector<double> distances = std::apply(
-    //     [&graph,&k](auto&&... unpackedArgs) { return BundleDijkstras(unpackedArgs..., graph, 0, k); }, //everything passed into dijkstras is empty rn for some reason?
-    //     construction
-    // );
-    // for (size_t i=0; i< n; i++) {
-    //     std::cout << "Node: " << i << ", Distance: " << distances[i] << std::endl;
-    // }
 
     // Create an output file stream
     std::ofstream outFile("../graph_generation/alg.txt");
@@ -41,7 +34,7 @@ int main() {
     // Close the file
     outFile.close();
     // Confirm the operation
-    std::cout << "Randomized SSSP written to output.txt" << std::endl;
+    std::cout << "Randomized SSSP written to alg.txt" << std::endl;
 
     
     std::cout << "Number of comparisons for Randomized Alg: " << randomized_comparison_counter << std::endl;

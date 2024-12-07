@@ -38,7 +38,7 @@ std::vector<std::pair<double, int>> DijkstraAlgo(std::vector<std::vector<std::pa
             int adj_node_num = adj.first;
             double edge_weight = adj.second;
             node<std::pair<double, int>> adj_node = *pointers[adj_node_num];
-            int adj_node_dist = adj_node.getValue().first;
+            double adj_node_dist = adj_node.getValue().first;
 
             //try to relax
             dijkstras_comparison_counter++;
@@ -107,7 +107,7 @@ std::vector<std::pair<double, int>> DijkstraAlgoLazy(std::vector<std::vector<std
             int adj_node_num = adj.first;
             double edge_weight = adj.second;
             node<std::pair<double, int>> adj_node = *pointers[adj_node_num];
-            int adj_node_dist = adj_node.getValue().first;
+            double adj_node_dist = adj_node.getValue().first;
 
             //try to relax
             randomized_arithmetic_op_counter++;
