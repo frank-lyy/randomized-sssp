@@ -197,15 +197,10 @@ std::tuple<
     //         std::cout << "  destination: " << destination << ", Distance: " << distance << "\n";
     //     }
     // }
-    t1 = high_resolution_clock::now();
-    auto R_ptr = std::make_unique<std::unordered_set<int>>(std::move(R));
-    auto bundle_parents_ptr = std::make_unique<std::vector<std::pair<double,int>>>(std::move(bundle_parents));
-    auto bundle_map_ptr = std::make_unique<std::unordered_map<int,std::vector<std::pair<double, int>>>>(std::move(bundle_map));
-    auto ball_map_ptr = std::make_unique<std::unordered_map<int,std::vector<std::pair<double, int>>>>(std::move(ball_map));
-    t2 = high_resolution_clock::now();
-    ms_double = t2 - t1;
-    std::cout << ms_double.count() << "ms to make pointers of returns\n";
-    return std::make_tuple(std::move(R_ptr), std::move(bundle_parents_ptr), std::move(bundle_map_ptr), std::move(ball_map_ptr));
+    return std::make_tuple(std::make_unique<std::unordered_set<int>>(std::move(R)),
+                            std::make_unique<std::vector<std::pair<double,int>>>(std::move(bundle_parents)),
+                            std::make_unique<std::unordered_map<int,std::vector<std::pair<double, int>>>>(std::move(bundle_map)),
+                            std::make_unique<std::unordered_map<int,std::vector<std::pair<double, int>>>>(std::move(ball_map)));
 
 
     
