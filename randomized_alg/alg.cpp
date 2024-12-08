@@ -1,7 +1,8 @@
 #include "construction.hpp"
 #include "bundle_dijkstras.hpp"
 #include "globals.hpp"
-#include "../graph.hpp"
+// #include "../graph.hpp"
+#include "../constant.hpp"
 #include <iostream>
 #include <vector>
 #include <cmath>
@@ -26,7 +27,7 @@ int main() {
     auto t2 = high_resolution_clock::now();
     duration<double, std::milli> ms_double = t2 - t1;
 
-    std::vector<std::vector<std::pair<int, double>>> graph = read_graph(true);
+    std::vector<std::vector<std::pair<int, double>>> graph = make_constant_degree_graph();
     int n = graph.size();
     std::cout << "graph size: " << n << std::endl;
     // double k = std::max(sqrt(std::log(n)/std::log(std::log(n))), static_cast<double>(n)); //if n is too small, this could give a negative?

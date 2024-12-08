@@ -3,14 +3,9 @@
 #include <vector>
 #include <unordered_map>
 
-inline std::vector<std::vector<std::pair<int, double>>> read_graph(bool constant_degree) {
+inline std::vector<std::vector<std::pair<int, double>>> read_graph() {
     std::string filename;
-    if (constant_degree) {
-        filename = "../graph_generation/constant_degree_graph.txt";
-        // filename = "../graph_generation/graph.txt";
-    } else {
-        filename = "../graph_generation/graph.txt";
-    }
+    filename = "../graph_generation/graph.txt";
     std::ifstream inputFile(filename);
     // if (!inputFile.is_open()) {
     //     std::cerr << "Error: Could not open file.\n";

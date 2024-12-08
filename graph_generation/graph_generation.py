@@ -86,4 +86,4 @@ if __name__ == "__main__":
     with open("true_reference.txt", "w") as file:
         for node, dist in dists.items():
             file.write(f"{node} {dist}\n")
-    G_prime = construct_constant_degree_graph(G)
+    # G_prime = construct_constant_degree_graph(G)
