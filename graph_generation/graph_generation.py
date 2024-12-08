@@ -79,7 +79,7 @@ def construct_constant_degree_graph(G):
     return G_prime
 
 if __name__ == "__main__":
-    num_nodes = 1000
+    num_nodes = 2000
     edge_probability = 0.01
     G = generate_random_graph(num_nodes, edge_probability)
     dists = nx.shortest_path_length(G, source=0, weight="weight")
