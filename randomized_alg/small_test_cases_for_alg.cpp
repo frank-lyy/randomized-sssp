@@ -5,11 +5,11 @@
 #include "bundle_dijkstras.hpp"
 #include "globals.hpp"
 
-int randomized_comparison_counter = 0;
-int randomized_arithmetic_op_counter = 0;
+long long randomized_comparison_counter = 0;
+long long randomized_arithmetic_op_counter = 0;
 
-int dijkstras_comparison_counter = 0;
-int dijkstras_arithmetic_op_counter = 0;
+long long dijkstras_comparison_counter = 0;
+long long dijkstras_arithmetic_op_counter = 0;
 
 int main() {
     // std::vector<std::vector<std::pair<int, double>>> graph  = {

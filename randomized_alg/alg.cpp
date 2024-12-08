@@ -14,11 +14,11 @@ using std::chrono::duration_cast;
 using std::chrono::duration;
 using std::chrono::milliseconds;
 
-int randomized_comparison_counter = 0;
-int randomized_arithmetic_op_counter = 0;
+long long randomized_comparison_counter = 0;
+long long randomized_arithmetic_op_counter = 0;
 
-int dijkstras_comparison_counter = 0;
-int dijkstras_arithmetic_op_counter = 0;
+long long dijkstras_comparison_counter = 0;
+long long dijkstras_arithmetic_op_counter = 0;
 
 
 int main() {
