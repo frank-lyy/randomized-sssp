@@ -3,10 +3,13 @@ import json
 def evaluate_correctness_with_constant_degree():
     reference_filename = "reference.txt"
     alg_filename = "alg.txt"
-    mappings_filename = "node_mappings.json"
+    mappings_filename = "node_mappings.txt"
 
+    mappings = {}
     with open(mappings_filename) as f:
-        mappings = json.load(f)
+       for line in f:
+           node, mapping = line.split()
+           mappings[node] = mapping
 
     reference_distances = {}
     with open(reference_filename) as f:

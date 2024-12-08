@@ -34,9 +34,9 @@ inline std::vector<std::vector<std::pair<int, double>>> make_constant_degree_gra
     std::vector<std::vector<int>> nodeMappings(numNodes);
     int nextNodeId = 0;
 
-    std::ofstream graphFile("./graph_generation/constant_degree_graph.txt");
+    std::ofstream graphFile("../graph_generation/constant_degree_graph.txt");
     graphFile << newEdges << std::endl;
-    std::ofstream mappingFile("./graph_generation/node_mappings.txt");
+    std::ofstream mappingFile("../graph_generation/node_mappings.txt");
     // if (!graphFile || !mappingFile) {
     //     std::cerr << "Error opening output files!" << std::endl;
     //     return;
@@ -47,7 +47,7 @@ inline std::vector<std::vector<std::pair<int, double>>> make_constant_degree_gra
 
         for (const auto& edge : neighbors) {
             int v = edge.first;
-            int w = edge.second;
+            double w = edge.second;
 
             int newU = nextNodeId;
             int newV = nextNodeId + 1;
@@ -70,7 +70,8 @@ inline std::vector<std::vector<std::pair<int, double>>> make_constant_degree_gra
             for (int i = 0; i < cycleSize; ++i) {
                 int from = cycleNodes[i];
                 int to = cycleNodes[(i + 1) % cycleSize];
-                g_prime.push_back({{to, 0.0}});
+                g_prime[from].push_back(std::make_pair(to, 0.0));
+                g_prime[to].push_back(std::make_pair(from, 0.0));
                 graphFile << from << " " << to << " 0.0\n";
                 mappingFile << nodeMappings[u][i] << " " << u << "\n";
             }
