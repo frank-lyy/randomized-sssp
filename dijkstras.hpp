@@ -10,27 +10,32 @@ using namespace std;
 std::vector<std::pair<double, int>> DijkstraAlgo(std::vector<std::vector<std::pair<int, double>>> &graph, int src) 
 {
     size_t numNodes = graph.size();
+    std::unordered_set<int> popped_nodes;
     // Initialize a vector with size 'numNodes' and all values set to MAX_INT
-    std::vector<int> distances(numNodes, std::numeric_limits<int>::max());
-    std::vector<node<std::pair<double, int>>*> pointers(numNodes);
-    distances[src] = 0;
+    // std::vector<int> distances(numNodes, std::numeric_limits<int>::max());
+    std::unordered_map<int, node<std::pair<double, int>>*> pointers;
+    // distances[src] = 0;
 
     std::vector<std::pair<double, int>> output;            
     
     FibonacciHeap<std::pair<double, int>> H;
+    node<std::pair<double, int>>* pointer = H.insert({0, src});
+    pointers[src] = pointer;
 
     
-    dijkstras_comparison_counter++;
-    for(size_t i = 0; i < distances.size(); ++i) {
-        dijkstras_comparison_counter++;
-        dijkstras_arithmetic_op_counter++;
-        node<std::pair<double, int>>* pointer = H.insert({distances[i],i});
-        pointers[i] = pointer;
-    }
+    // dijkstras_comparison_counter++;
+    // for(size_t i = 0; i < distances.size(); ++i) {
+    //     dijkstras_comparison_counter++;
+    //     dijkstras_arithmetic_op_counter++;
+    //     node<std::pair<double, int>>* pointer = H.insert({distances[i],i});
+    //     pointers[i] = pointer;
+    // }
 
     dijkstras_comparison_counter++;
     while (!H.isEmpty()) {
         std::pair<double, int> start_node = H.removeMinimum();
+        pointers.erase(start_node.second);
+        popped_nodes.insert(start_node.second);
         output.push_back(start_node); //push to our output (distance,node)
         int node_num = start_node.second;
         double node_dist = start_node.first;
@@ -38,16 +43,28 @@ std::vector<std::pair<double, int>> DijkstraAlgo(std::vector<std::vector<std::pa
         for (std::pair<int, double> adj: edges) {
             int adj_node_num = adj.first;
             double edge_weight = adj.second;
-            node<std::pair<double, int>> adj_node = *pointers[adj_node_num];
-            double adj_node_dist = adj_node.getValue().first;
 
-            //try to relax
             dijkstras_comparison_counter++;
-            dijkstras_arithmetic_op_counter++;
-            if (node_dist + edge_weight < adj_node_dist) {
+            if (pointers.find(adj_node_num) == pointers.end()) {
+                // adjacent node has not been added to heap
+                // if this is actually something we've already seen and just removed from the heap, skip it            
+                dijkstras_comparison_counter++;
+                if(popped_nodes.find(adj_node_num) != popped_nodes.end()) {
+                    continue;
+                }
+                node<std::pair<double, int>>* adj_pointer = H.insert({node_dist + edge_weight, adj_node_num});
+                pointers[adj_node_num] = adj_pointer;
+            } else {
+                node<std::pair<double, int>> adj_node = *pointers[adj_node_num];
+                double adj_node_dist = adj_node.getValue().first;
+
+                //try to relax
                 dijkstras_arithmetic_op_counter++;
+                dijkstras_comparison_counter++;
                 double new_adj_node_dist = node_dist + edge_weight;
-                H.decreaseKey(pointers[adj_node_num], {new_adj_node_dist, adj_node_num});
+                if (new_adj_node_dist < adj_node_dist) {
+                    H.decreaseKey(pointers[adj_node_num], {new_adj_node_dist, adj_node_num});
+                }
             }
 
         }
@@ -62,6 +79,7 @@ std::vector<std::pair<double, int>> DijkstraAlgo(std::vector<std::vector<std::pa
 //Dijkstra with a set of nodes R and a limit of nodes it can pop from the queue. Once it reaches this limit, it aborts and returns an empty vector.
 std::vector<std::pair<double, int>> DijkstraAlgoLazy(std::vector<std::vector<std::pair<int, double>>> &graph, int src, std::unordered_set<int> &R, int node_limit) {
     size_t popped_counter = 0;
+    std::unordered_set<int> popped_nodes;
     
     // size_t numNodes = graph.size();
     // Initialize a vector with size 'numNodes' and all values set to MAX_INT
@@ -89,6 +107,7 @@ std::vector<std::pair<double, int>> DijkstraAlgoLazy(std::vector<std::vector<std
     while (!H.isEmpty()) {
         std::pair<double, int> start_node = H.removeMinimum();
         pointers.erase(start_node.second);
+        popped_nodes.insert(start_node.second);
         output.push_back(start_node); //push to our output (distance,node)
 
         //check if the node is in the set R. If so, we have completed this Dijkstra's and we can return
@@ -115,6 +134,11 @@ std::vector<std::pair<double, int>> DijkstraAlgoLazy(std::vector<std::vector<std
             randomized_comparison_counter++;
             if (pointers.find(adj_node_num) == pointers.end()) {
                 // adjacent node has not been added to heap
+                // if this is actually something we've already seen and just removed from the heap, skip it            
+                randomized_comparison_counter++;
+                if(popped_nodes.find(adj_node_num) != popped_nodes.end()) {
+                    continue;
+                }
                 node<std::pair<double, int>>* adj_pointer = H.insert({node_dist + edge_weight, adj_node_num});
                 pointers[adj_node_num] = adj_pointer;
             } else {
@@ -124,9 +148,8 @@ std::vector<std::pair<double, int>> DijkstraAlgoLazy(std::vector<std::vector<std
                 //try to relax
                 randomized_arithmetic_op_counter++;
                 randomized_comparison_counter++;
-                if (node_dist + edge_weight < adj_node_dist) {
-                    randomized_arithmetic_op_counter++;
-                    double new_adj_node_dist = node_dist + edge_weight;
+                double new_adj_node_dist = node_dist + edge_weight;
+                if (new_adj_node_dist < adj_node_dist) {
                     H.decreaseKey(pointers[adj_node_num], {new_adj_node_dist, adj_node_num});
                 }
             }
