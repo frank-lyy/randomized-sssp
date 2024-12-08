@@ -23,6 +23,8 @@ int dijkstras_arithmetic_op_counter = 0;
 
 int main() {
     // timing things
+    auto _t1 = high_resolution_clock::now();
+    
     auto t1 = high_resolution_clock::now();
     auto t2 = high_resolution_clock::now();
     duration<double, std::milli> ms_double = t2 - t1;
@@ -49,7 +51,11 @@ int main() {
     const std::vector<double> &distances = BundleDijkstras(R,bundle_parents,bundle_map,ball_map,graph,0,k);
     t2 = high_resolution_clock::now();
     ms_double = t2 - t1;
-    std::cout << "Dijkstras time: " << ms_double.count() << " ms" << std::endl;
+    std::cout << "Bundle Dijkstras time: " << ms_double.count() << " ms" << std::endl;
+    
+    auto _t2 = high_resolution_clock::now();
+    duration<double, std::milli> _ms_double = _t2 - _t1;
+    std::cout << "Total Randomized Alg time: " << _ms_double.count() << " ms" << std::endl;
 
     // Create an output file stream
     std::ofstream outFile("../graph_generation/alg.txt");
