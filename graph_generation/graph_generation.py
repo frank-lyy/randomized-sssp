@@ -47,7 +47,8 @@ def generate_random_graph_manual(num_nodes, num_extra_edges):
         file.write(f"{num_nodes}\n")
         for u, adjacency in enumerate(G):
             for (v, weight) in adjacency:
-                file.write(f"{u} {v} {weight}\n")
+                if u<v:
+                    file.write(f"{u} {v} {weight}\n")
     print("Graph saved to graph.txt")
 
     return G
