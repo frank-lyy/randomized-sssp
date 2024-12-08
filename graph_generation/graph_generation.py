@@ -116,8 +116,8 @@ def construct_constant_degree_graph(G):
     return G_prime
 
 if __name__ == "__main__":
-    num_nodes = 10000
-    num_extra_edges = 2000
+    num_nodes = 10000000
+    num_extra_edges = 10000
     G = generate_random_graph_manual(num_nodes, num_extra_edges)
     # dists = nx.shortest_path_length(G, source=0, weight="weight")
     # with open("true_reference.txt", "w") as file:

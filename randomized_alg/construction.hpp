@@ -16,7 +16,7 @@ using std::chrono::duration_cast;
 using std::chrono::duration;
 using std::chrono::milliseconds;
 
-bool ChanceBool(double probabilityTrue) {
+inline bool ChanceBool(double probabilityTrue) {
     std::random_device rd;
     std::mt19937 gen(rd());
     std::bernoulli_distribution dis(probabilityTrue);
@@ -45,9 +45,10 @@ std::tuple<
     double chance = 1.0 / k;
     std::cout << "Chance: " << chance << "\n";
     randomized_comparison_counter++;
+    std::random_device rd;
     for (size_t i=0; i<numNodes; i++) {
         randomized_comparison_counter++;
-        if(ChanceBool(chance)) {
+        if(rd() < (chance * std::numeric_limits<unsigned int>::max())) {
             // std::cout << "Randomly selected node: " << i << "\n";
             R.insert(i);
         }
@@ -70,13 +71,13 @@ std::tuple<
     for (size_t i=0; i<numNodes; i++) {
         randomized_comparison_counter++;
         if (R.find(i) == R.end()) { //if node i is not in r, run dijkstras
-            auto _t1 = high_resolution_clock::now();
+            // auto _t1 = high_resolution_clock::now();
             std::vector<std::pair<double, int>> V_extract = DijkstraAlgoLazy(graph, i, R, node_limit);
-            if (i % 10000 == 1) {
-                auto _t2 = high_resolution_clock::now();
-                duration<double, std::milli> _ms_double = _t2 - _t1;
-                std::cout << _ms_double.count() << "ms to run dijkstra-algo-lazy\n";
-            }
+            // if (i % 10000 == 1) {
+            //     auto _t2 = high_resolution_clock::now();
+            //     duration<double, std::milli> _ms_double = _t2 - _t1;
+            //     std::cout << _ms_double.count() << "ms to run dijkstra-algo-lazy\n";
+            // }
             randomized_comparison_counter++;
             if(V_extract.empty()) {
                 R.insert(i);

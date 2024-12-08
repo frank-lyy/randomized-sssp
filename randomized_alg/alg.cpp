@@ -38,7 +38,7 @@ int main() {
     int n = graph.size();
     std::cout << "graph size: " << n << std::endl;
     double k = sqrt(std::log(n)/std::log(std::log(n)));
-    k = 5;
+    k *= 10;
     std::cout << "k: " << k << std::endl;
 
     t1 = high_resolution_clock::now();
@@ -57,14 +57,14 @@ int main() {
     duration<double, std::milli> _ms_double = _t2 - _t1;
     std::cout << "Total Randomized Alg time: " << _ms_double.count() << " ms" << std::endl;
 
-    // Create an output file stream
-    std::ofstream outFile("../graph_generation/alg.txt");
-    // Write to the file
-    for (size_t i=0; i<n; i++) {
-        outFile << i << " " << distances[i] << std::endl;  
-    }
+    // // Create an output file stream
+    // std::ofstream outFile("../graph_generation/alg.txt");
+    // // Write to the file
+    // for (size_t i=0; i<n; i++) {
+    //     outFile << i << " " << distances[i] << std::endl;  
+    // }
     // Close the file
-    outFile.close();
+    // outFile.close();
     // Confirm the operation
     std::cout << "Randomized SSSP written to alg.txt" << std::endl;
 

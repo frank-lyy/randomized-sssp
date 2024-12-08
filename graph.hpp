@@ -2,6 +2,7 @@
 #include <fstream>
 #include <vector>
 #include <unordered_map>
+#include "randomized_alg/globals.hpp"
 
 inline std::vector<std::vector<std::pair<int, double>>> read_graph() {
     std::string filename;
@@ -20,9 +21,12 @@ inline std::vector<std::vector<std::pair<int, double>>> read_graph() {
     // Read edges from file
     int u, v;
     double w;
+    dijkstras_comparison_counter++;
     while (inputFile >> u >> v >> w) {
         graph[u].push_back(std::make_pair(v, w));
         graph[v].push_back(std::make_pair(u, w)); // For undirected graph
+
+        dijkstras_comparison_counter++;
     }
     inputFile.close();
 
