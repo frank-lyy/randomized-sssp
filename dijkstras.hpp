@@ -2,6 +2,7 @@
 #include <vector>
 #include <limits>
 #include <unordered_set>
+#include <unordered_map>
 #include "fheap.hpp"
 using namespace std;
 
@@ -87,6 +88,7 @@ std::vector<std::pair<double, int>> DijkstraAlgoLazy(std::vector<std::vector<std
     randomized_comparison_counter++;
     while (!H.isEmpty()) {
         std::pair<double, int> start_node = H.removeMinimum();
+        pointers.erase(start_node.second);
         output.push_back(start_node); //push to our output (distance,node)
 
         //check if the node is in the set R. If so, we have completed this Dijkstra's and we can return
@@ -113,19 +115,20 @@ std::vector<std::pair<double, int>> DijkstraAlgoLazy(std::vector<std::vector<std
             randomized_comparison_counter++;
             if (pointers.find(adj_node_num) == pointers.end()) {
                 // adjacent node has not been added to heap
-                node<std::pair<double, int>>* adj_pointer = H.insert({std::numeric_limits<int>::max(), adj_node_num});
+                node<std::pair<double, int>>* adj_pointer = H.insert({node_dist + edge_weight, adj_node_num});
                 pointers[adj_node_num] = adj_pointer;
-            }
-            node<std::pair<double, int>> adj_node = *pointers[adj_node_num];
-            double adj_node_dist = adj_node.getValue().first;
+            } else {
+                node<std::pair<double, int>> adj_node = *pointers[adj_node_num];
+                double adj_node_dist = adj_node.getValue().first;
 
-            //try to relax
-            randomized_arithmetic_op_counter++;
-            randomized_comparison_counter++;
-            if (node_dist + edge_weight < adj_node_dist) {
+                //try to relax
                 randomized_arithmetic_op_counter++;
-                double new_adj_node_dist = node_dist + edge_weight;
-                H.decreaseKey(pointers[adj_node_num], {new_adj_node_dist, adj_node_num});
+                randomized_comparison_counter++;
+                if (node_dist + edge_weight < adj_node_dist) {
+                    randomized_arithmetic_op_counter++;
+                    double new_adj_node_dist = node_dist + edge_weight;
+                    H.decreaseKey(pointers[adj_node_num], {new_adj_node_dist, adj_node_num});
+                }
             }
         }
         randomized_comparison_counter++;
