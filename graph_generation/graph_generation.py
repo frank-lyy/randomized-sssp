@@ -21,6 +21,37 @@ def generate_random_graph(num_nodes, edge_probability):
     
     return G
 
+def generate_random_graph_manual(num_nodes, num_extra_edges):
+    # Initialize the graph as a list of adjacency lists
+    G = [[] for _ in range(num_nodes)]
+
+    # Step 1: Generate a spanning tree (ensure connectivity)
+    for i in range(1, num_nodes):
+        parent = random.randint(0, i - 1)  # Randomly connect to a previous node
+        weight = random.uniform(1.0, 10.0)  # Random weight (1.0 to 10.0)
+        G[i].append((parent, weight))
+        G[parent].append((i, weight))  # Undirected edge
+
+    # Step 2: Add extra random edges for more complexity
+    for _ in range(num_extra_edges):
+        u = random.randint(0, num_nodes - 1)
+        v = random.randint(0, num_nodes - 1)
+        while u == v:  # Avoid self-loops
+            v = random.randint(0, num_nodes - 1)
+
+        weight = random.uniform(1.0, 10.0)  # Random weight (1.0 to 10.0)
+        G[u].append((v, weight))
+        G[v].append((u, weight))  # Undirected edge
+
+    with open("graph.txt", "w") as file:
+        file.write(f"{num_nodes}\n")
+        for u, adjacency in enumerate(G):
+            for (v, weight) in adjacency:
+                file.write(f"{u} {v} {weight}\n")
+    print("Graph saved to graph.txt")
+
+    return G
+
 def construct_constant_degree_graph(G):
     """
     Constructs G' from G such that each vertex in G' has degree at most 3.
@@ -80,10 +111,10 @@ def construct_constant_degree_graph(G):
 
 if __name__ == "__main__":
     num_nodes = 2000
-    edge_probability = 0.01
-    G = generate_random_graph(num_nodes, edge_probability)
-    dists = nx.shortest_path_length(G, source=0, weight="weight")
-    with open("true_reference.txt", "w") as file:
-        for node, dist in dists.items():
-            file.write(f"{node} {dist}\n")
-    G_prime = construct_constant_degree_graph(G)
+    num_extra_edges = 2000
+    G = generate_random_graph_manual(num_nodes, num_extra_edges)
+    # dists = nx.shortest_path_length(G, source=0, weight="weight")
+    # with open("true_reference.txt", "w") as file:
+    #     for node, dist in dists.items():
+    #         file.write(f"{node} {dist}\n")
+    # G_prime = construct_constant_degree_graph(G)

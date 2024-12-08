@@ -51,5 +51,5 @@ def evaluate_correctness():
     return True
 
 if __name__ == "__main__":
-    evaluate_correctness()
+    evaluate_correctness_with_constant_degree()
 
