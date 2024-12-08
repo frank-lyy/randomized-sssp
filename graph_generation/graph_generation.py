@@ -26,9 +26,12 @@ def generate_random_graph_manual(num_nodes, num_extra_edges):
     G = [[] for _ in range(num_nodes)]
 
     # Step 1: Generate a spanning tree (ensure connectivity)
+    edges = set()
     for i in range(1, num_nodes):
         parent = random.randint(0, i - 1)  # Randomly connect to a previous node
-        weight = random.uniform(1.0, 10.0)  # Random weight (1.0 to 10.0)
+        weight = round(random.uniform(1.0, 10.0),2)  # Random weight (1.0 to 10.0)
+        edges.add((i, parent))
+        edges.add((parent, i))
         G[i].append((parent, weight))
         G[parent].append((i, weight))  # Undirected edge
 
@@ -36,12 +39,14 @@ def generate_random_graph_manual(num_nodes, num_extra_edges):
     for _ in range(num_extra_edges):
         u = random.randint(0, num_nodes - 1)
         v = random.randint(0, num_nodes - 1)
-        while u == v:  # Avoid self-loops
+        while u == v or (u,v) in edges:  # Avoid self-loops
             v = random.randint(0, num_nodes - 1)
 
-        weight = random.uniform(1.0, 10.0)  # Random weight (1.0 to 10.0)
+        weight = round(random.uniform(1.0, 10.0),2)  # Random weight (1.0 to 10.0)
         G[u].append((v, weight))
         G[v].append((u, weight))  # Undirected edge
+        edges.add((i, parent))
+        edges.add((parent, i))
 
     with open("graph.txt", "w") as file:
         file.write(f"{num_nodes}\n")
