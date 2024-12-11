@@ -6,7 +6,7 @@
 #include <sstream>
 #include "randomized_alg/globals.hpp"
 
-inline std::vector<std::vector<std::pair<int, double>>> make_constant_degree_graph() {
+std::vector<std::vector<std::pair<int, double>>> make_constant_degree_graph() {
     std::string filename;
     filename = "../graph_generation/graph.txt";
     std::ifstream inputFile(filename);
@@ -41,10 +41,10 @@ inline std::vector<std::vector<std::pair<int, double>>> make_constant_degree_gra
     // std::ofstream graphFile("../graph_generation/constant_degree_graph.txt");
     // graphFile << newEdges << std::endl;
     // std::ofstream mappingFile("../graph_generation/node_mappings.txt");
-    // if (!graphFile || !mappingFile) {
-    //     std::cerr << "Error opening output files!" << std::endl;
-    //     return;
-    // }
+    // // if (!graphFile || !mappingFile) {
+    // //     std::cerr << "Error opening output files!" << std::endl;
+    // //     return;
+    // // }
 
     randomized_comparison_counter++;
     for (int u = 0; u < g.size(); ++u) {
@@ -92,8 +92,8 @@ inline std::vector<std::vector<std::pair<int, double>>> make_constant_degree_gra
                 randomized_arithmetic_op_counter += 2;
             }
         }
-        // } else {
-        //     // mappingFile << nodeMappings[u][0] << " " << u << "\n";
+        // else {
+        //     mappingFile << nodeMappings[u][0] << " " << u << "\n";
         // }
 
         randomized_comparison_counter++;

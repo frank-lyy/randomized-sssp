@@ -9,7 +9,13 @@
 #include <tuple>
 #include <memory> 
 
-void PhaseOneRelax(int node_num, double new_dist, std::unordered_set<int>& R, FibonacciHeap<std::pair<double, int>>& H, std::vector<double> &distances, std::vector<node<std::pair<double, int>>*>& pointers) {
+inline void PhaseOneRelax(
+    int node_num, double new_dist, 
+    std::unordered_set<int>& R, 
+    FibonacciHeap<std::pair<double, int>>& H, 
+    std::vector<double>& distances, 
+    std::vector<node<std::pair<double, int>>*>& pointers) 
+{
     randomized_comparison_counter++;
     if (new_dist < distances[node_num]) {
         distances[node_num] = new_dist;
@@ -21,7 +27,14 @@ void PhaseOneRelax(int node_num, double new_dist, std::unordered_set<int>& R, Fi
     }
 
 }
-void PhaseTwoRelax(int node_num, double new_dist, std::unordered_set<int>& R, FibonacciHeap<std::pair<double, int>>& H, std::vector<double> &distances, std::vector<node<std::pair<double, int>>*>& pointers, std::vector<std::pair<double,int>>& bundle_parents) {
+inline void PhaseTwoRelax(
+    int node_num, double new_dist, 
+    std::unordered_set<int>& R, 
+    FibonacciHeap<std::pair<double, int>>& H, 
+    std::vector<double>& distances, 
+    std::vector<node<std::pair<double, int>>*>& pointers, 
+    std::vector<std::pair<double,int>>& bundle_parents) 
+{
     randomized_comparison_counter++;
     if (new_dist < distances[node_num]) {
         distances[node_num] = new_dist;
@@ -39,7 +52,13 @@ void PhaseTwoRelax(int node_num, double new_dist, std::unordered_set<int>& R, Fi
     }
 }
 
-std::vector<double> BundleDijkstras(const std::unique_ptr<std::unordered_set<int>>& R_ptr, const std::unique_ptr<std::vector<std::pair<double,int>>>& bundle_parents_ptr, const std::unique_ptr<std::unordered_map<int,std::vector<std::pair<double, int>>>>& bundle_map_ptr, const std::unique_ptr<std::unordered_map<int,std::vector<std::pair<double, int>>>>& ball_map_ptr, std::vector<std::vector<std::pair<int, double>>> &graph, int src, int k) {
+std::vector<double> BundleDijkstras(
+    const std::unique_ptr<std::unordered_set<int>>& R_ptr, 
+    const std::unique_ptr<std::vector<std::pair<double,int>>>& bundle_parents_ptr, 
+    const std::unique_ptr<std::unordered_map<int,std::vector<std::pair<double, int>>>>& bundle_map_ptr, 
+    const std::unique_ptr<std::unordered_map<int,std::vector<std::pair<double, int>>>>& ball_map_ptr, 
+    std::vector<std::vector<std::pair<int, double>>> &graph, int src, int k) 
+{
     auto& R = *R_ptr;
     auto& bundle_parents = *bundle_parents_ptr;
     auto& bundle_map = *bundle_map_ptr;
@@ -48,6 +67,9 @@ std::vector<double> BundleDijkstras(const std::unique_ptr<std::unordered_set<int
     size_t numNodes = graph.size();
     std::vector<double> distances(numNodes, std::numeric_limits<int>::max());
     std::vector<node<std::pair<double, int>>*> pointers(numNodes);
+    // std::unordered_set<int> popped_nodes;
+    // std::vector<std::pair<double, int>> output;
+    // std::unordered_map<int, node<std::pair<double, int>>*> pointers;
     distances[src] = 0;
 
     FibonacciHeap<std::pair<double, int>> H;
@@ -59,13 +81,23 @@ std::vector<double> BundleDijkstras(const std::unique_ptr<std::unordered_set<int
 
     randomized_comparison_counter++;
     while (!H.isEmpty()) {
-        auto [u_dist, u_num] = H.removeMinimum();
+        auto start_node = H.removeMinimum();
+        auto [u_dist, u_num] = start_node;
+        // pointers.erase(start_node.second);
+        // popped_nodes.insert(start_node.second);
+        // output.push_back(start_node);
         //phase 1
         for (const auto& [v_u_dist,v_num] : bundle_map[u_num]) {
+            // if (popped_nodes.find(v_num) != popped_nodes.end()) {
+            //     continue;
+            // }
             randomized_arithmetic_op_counter++;
             PhaseOneRelax(v_num, u_dist+v_u_dist, R, H, distances, pointers);
 
             for (const auto& [y_v_dist,y_num] : ball_map[v_num]) {
+                // if (popped_nodes.find(y_num) != popped_nodes.end()) {
+                //     continue;
+                // }
                 randomized_arithmetic_op_counter++;
                 PhaseOneRelax(v_num,distances[y_num]+y_v_dist, R, H, distances, pointers);
             }

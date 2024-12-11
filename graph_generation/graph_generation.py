@@ -2,6 +2,31 @@ import networkx as nx
 import json
 import random
 
+def generate_grid_graph(num_rows, num_cols):
+    # Generate a grid graph
+    G = nx.grid_graph([num_rows, num_cols])
+    for u, v in G.edges():
+        G[u][v]["weight"] = round(random.uniform(1, 10), 2)  # Assign random weights between 1 and 10
+
+    # Save the graph to a file in edge list format
+    next_node_id = 0
+    node_mapping = {}
+    with open("graph.txt", "w") as file:
+        file.write(f"{num_rows * num_cols}\n")
+        for u, v, data in G.edges(data=True):
+            if u not in node_mapping:
+                node_mapping[u] = next_node_id
+                next_node_id += 1
+            if v not in node_mapping:
+                node_mapping[v] = next_node_id
+                next_node_id += 1
+            u = node_mapping[u]
+            v = node_mapping[v]
+            file.write(f"{u} {v} {data['weight']}\n")
+    print("Graph saved to graph.txt")
+    
+    return G
+
 def generate_random_graph(num_nodes, edge_probability):
     # Generate a small random graph
     G = nx.erdos_renyi_graph(n=num_nodes, p=edge_probability, directed=False)  
@@ -45,8 +70,8 @@ def generate_random_graph_manual(num_nodes, num_extra_edges):
         weight = round(random.uniform(1.0, 10.0),2)  # Random weight (1.0 to 10.0)
         G[u].append((v, weight))
         G[v].append((u, weight))  # Undirected edge
-        edges.add((i, parent))
-        edges.add((parent, i))
+        edges.add((u, v))
+        edges.add((v, u))
 
     with open("graph.txt", "w") as file:
         file.write(f"{num_nodes}\n")
@@ -116,9 +141,10 @@ def construct_constant_degree_graph(G):
     return G_prime
 
 if __name__ == "__main__":
-    num_nodes = 10000000
-    num_extra_edges = 10000
-    G = generate_random_graph_manual(num_nodes, num_extra_edges)
+    num_nodes = 50_000_000
+    num_extra_edges = 10_000
+    generate_grid_graph(1000, 10000)
+    # G = generate_random_graph_manual(num_nodes, num_extra_edges)
     # dists = nx.shortest_path_length(G, source=0, weight="weight")
     # with open("true_reference.txt", "w") as file:
     #     for node, dist in dists.items():

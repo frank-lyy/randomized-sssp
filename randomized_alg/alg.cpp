@@ -1,7 +1,7 @@
 #include "construction.hpp"
 #include "bundle_dijkstras.hpp"
 #include "globals.hpp"
-// #include "../graph.hpp"
+#include "../graph.hpp"
 #include "../constant.hpp"
 #include <iostream>
 #include <vector>
@@ -30,7 +30,8 @@ int main() {
     duration<double, std::milli> ms_double = t2 - t1;
 
     t1 = high_resolution_clock::now();
-    std::vector<std::vector<std::pair<int, double>>> graph = make_constant_degree_graph();
+    // std::vector<std::vector<std::pair<int, double>>> graph = make_constant_degree_graph();
+    std::vector<std::vector<std::pair<int, double>>> graph = read_graph();
     t2 = high_resolution_clock::now();
     ms_double = t2 - t1;
     std::cout << "Graph generation time: " << ms_double.count() << " ms" << std::endl;
@@ -38,7 +39,7 @@ int main() {
     int n = graph.size();
     std::cout << "graph size: " << n << std::endl;
     double k = sqrt(std::log(n)/std::log(std::log(n)));
-    k *= 10;
+    k *= 5;
     std::cout << "k: " << k << std::endl;
 
     t1 = high_resolution_clock::now();
@@ -63,7 +64,7 @@ int main() {
     // for (size_t i=0; i<n; i++) {
     //     outFile << i << " " << distances[i] << std::endl;  
     // }
-    // Close the file
+    // // Close the file
     // outFile.close();
     // Confirm the operation
     std::cout << "Randomized SSSP written to alg.txt" << std::endl;

@@ -42,7 +42,7 @@ std::tuple<
     size_t numNodes = graph.size();
     std::cout << "k (inside construction): " << k << "\n";
     randomized_arithmetic_op_counter++;
-    double chance = 1.0 / k;
+    double chance = 20 * (1.0 / k);
     std::cout << "Chance: " << chance << "\n";
     randomized_comparison_counter++;
     std::random_device rd;
