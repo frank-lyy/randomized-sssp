@@ -4,22 +4,22 @@
 #include <unordered_set>
 #include <unordered_map>
 #include "fheap.hpp"
+#include "bheap.hpp"
 using namespace std;
 
 // graph is an adjacency list with edge weights (list of list of pairs adj_node,weight)
 std::vector<std::pair<double, int>> DijkstraAlgo(std::vector<std::vector<std::pair<int, double>>> &graph, int src) 
 {
-    size_t numNodes = graph.size();
     std::unordered_set<int> popped_nodes;
     // Initialize a vector with size 'numNodes' and all values set to MAX_INT
     // std::vector<int> distances(numNodes, std::numeric_limits<int>::max());
-    std::unordered_map<int, node<std::pair<double, int>>*> pointers;
+    std::unordered_map<int, Node<std::pair<double, int>>*> pointers;
     // distances[src] = 0;
 
     std::vector<std::pair<double, int>> output;            
     
-    FibonacciHeap<std::pair<double, int>> H;
-    node<std::pair<double, int>>* pointer = H.insert({0, src});
+    MinHeap<std::pair<double, int>> H(graph.size());
+    Node<std::pair<double, int>>* pointer = H.insertKey({0, src});
     pointers[src] = pointer;
 
     
@@ -33,12 +33,12 @@ std::vector<std::pair<double, int>> DijkstraAlgo(std::vector<std::vector<std::pa
 
     dijkstras_comparison_counter++;
     while (!H.isEmpty()) {
-        std::pair<double, int> start_node = H.removeMinimum();
-        pointers.erase(start_node.second);
-        popped_nodes.insert(start_node.second);
-        output.push_back(start_node); //push to our output (distance,node)
-        int node_num = start_node.second;
-        double node_dist = start_node.first;
+        Node<std::pair<double, int>> start_node = H.extractMin();
+        int node_num = start_node.getValue().second;
+        double node_dist = start_node.getValue().first;
+        pointers.erase(node_num);
+        popped_nodes.insert(node_num);
+        output.push_back(start_node.getValue()); //push to our output (distance,node)
         std::vector<std::pair<int, double>> edges = graph[node_num];
         for (std::pair<int, double> adj: edges) {
             int adj_node_num = adj.first;
@@ -52,10 +52,10 @@ std::vector<std::pair<double, int>> DijkstraAlgo(std::vector<std::vector<std::pa
                 if(popped_nodes.find(adj_node_num) != popped_nodes.end()) {
                     continue;
                 }
-                node<std::pair<double, int>>* adj_pointer = H.insert({node_dist + edge_weight, adj_node_num});
+                Node<std::pair<double, int>>* adj_pointer = H.insertKey({node_dist + edge_weight, adj_node_num});
                 pointers[adj_node_num] = adj_pointer;
             } else {
-                node<std::pair<double, int>> adj_node = *pointers[adj_node_num];
+                Node<std::pair<double, int>> adj_node = *pointers[adj_node_num];
                 double adj_node_dist = adj_node.getValue().first;
 
                 //try to relax
@@ -63,7 +63,7 @@ std::vector<std::pair<double, int>> DijkstraAlgo(std::vector<std::vector<std::pa
                 dijkstras_comparison_counter++;
                 double new_adj_node_dist = node_dist + edge_weight;
                 if (new_adj_node_dist < adj_node_dist) {
-                    H.decreaseKey(pointers[adj_node_num], {new_adj_node_dist, adj_node_num});
+                    H.decreaseKey(pointers[adj_node_num]->getHeapIdx(), {new_adj_node_dist, adj_node_num});
                 }
             }
 
@@ -85,13 +85,13 @@ std::vector<std::pair<double, int>> DijkstraAlgoLazy(std::vector<std::vector<std
     // Initialize a vector with size 'numNodes' and all values set to MAX_INT
     // std::vector<int> distances(numNodes, std::numeric_limits<int>::max());
     // std::unordered_map<int, double> distances;
-    std::unordered_map<int, node<std::pair<double, int>>*> pointers;
+    std::unordered_map<int, Node<std::pair<double, int>>*> pointers;
     // distances[src] = 0;
 
     std::vector<std::pair<double, int>> output;            
     
-    FibonacciHeap<std::pair<double, int>> H;
-    node<std::pair<double, int>>* pointer = H.insert({0, src});
+    MinHeap<std::pair<double, int>> H(node_limit);
+    Node<std::pair<double, int>>* pointer = H.insertKey({0, src});
     pointers[src] = pointer;
 
     randomized_comparison_counter++;
@@ -105,14 +105,16 @@ std::vector<std::pair<double, int>> DijkstraAlgoLazy(std::vector<std::vector<std
     
     randomized_comparison_counter++;
     while (!H.isEmpty()) {
-        std::pair<double, int> start_node = H.removeMinimum();
-        pointers.erase(start_node.second);
-        popped_nodes.insert(start_node.second);
-        output.push_back(start_node); //push to our output (distance,node)
+        Node<std::pair<double, int>> start_node = H.extractMin();
+        int node_num = start_node.getValue().second;
+        double node_dist = start_node.getValue().first;
+        pointers.erase(node_num);
+        popped_nodes.insert(node_num);
+        output.push_back(start_node.getValue()); //push to our output (distance,node)
 
         //check if the node is in the set R. If so, we have completed this Dijkstra's and we can return
         randomized_comparison_counter++;
-        if (R.find(start_node.second) != R.end()) {
+        if (R.find(node_num) != R.end()) {
             return output;
         }
 
@@ -124,8 +126,6 @@ std::vector<std::pair<double, int>> DijkstraAlgoLazy(std::vector<std::vector<std
             return {};
         }
 
-        int node_num = start_node.second;
-        double node_dist = start_node.first;
         std::vector<std::pair<int, double>> edges = graph[node_num];
         for (std::pair<int, double> adj: edges) {
             int adj_node_num = adj.first;
@@ -139,10 +139,10 @@ std::vector<std::pair<double, int>> DijkstraAlgoLazy(std::vector<std::vector<std
                 if(popped_nodes.find(adj_node_num) != popped_nodes.end()) {
                     continue;
                 }
-                node<std::pair<double, int>>* adj_pointer = H.insert({node_dist + edge_weight, adj_node_num});
+                Node<std::pair<double, int>>* adj_pointer = H.insertKey({node_dist + edge_weight, adj_node_num});
                 pointers[adj_node_num] = adj_pointer;
             } else {
-                node<std::pair<double, int>> adj_node = *pointers[adj_node_num];
+                Node<std::pair<double, int>> adj_node = *pointers[adj_node_num];
                 double adj_node_dist = adj_node.getValue().first;
 
                 //try to relax
@@ -150,7 +150,7 @@ std::vector<std::pair<double, int>> DijkstraAlgoLazy(std::vector<std::vector<std
                 randomized_comparison_counter++;
                 double new_adj_node_dist = node_dist + edge_weight;
                 if (new_adj_node_dist < adj_node_dist) {
-                    H.decreaseKey(pointers[adj_node_num], {new_adj_node_dist, adj_node_num});
+                    H.decreaseKey(pointers[adj_node_num]->getHeapIdx(), {new_adj_node_dist, adj_node_num});
                 }
             }
         }

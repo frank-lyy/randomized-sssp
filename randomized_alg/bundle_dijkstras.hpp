@@ -1,4 +1,4 @@
-#include "../fheap.hpp"
+#include "../bheap.hpp"
 #include "globals.hpp"
 #include <limits>
 #include <unordered_set>
@@ -9,26 +9,26 @@
 #include <tuple>
 #include <memory> 
 
-void PhaseOneRelax(int node_num, double new_dist, std::unordered_set<int>& R, FibonacciHeap<std::pair<double, int>>& H, std::vector<double> &distances, std::vector<node<std::pair<double, int>>*>& pointers) {
+void PhaseOneRelax(int node_num, double new_dist, std::unordered_set<int>& R, MinHeap<std::pair<double, int>>& H, std::vector<double> &distances, std::vector<Node<std::pair<double, int>>*>& pointers) {
     randomized_comparison_counter++;
     if (new_dist < distances[node_num]) {
         distances[node_num] = new_dist;
         randomized_comparison_counter++;
         if (R.find(node_num) != R.end()) {
             //use the pointer to decrease key
-            H.decreaseKey(pointers[node_num], {new_dist, node_num});
+            H.decreaseKey(pointers[node_num]->getHeapIdx(), {new_dist, node_num});
         }
     }
 
 }
-void PhaseTwoRelax(int node_num, double new_dist, std::unordered_set<int>& R, FibonacciHeap<std::pair<double, int>>& H, std::vector<double> &distances, std::vector<node<std::pair<double, int>>*>& pointers, std::vector<std::pair<double,int>>& bundle_parents) {
+void PhaseTwoRelax(int node_num, double new_dist, std::unordered_set<int>& R, MinHeap<std::pair<double, int>>& H, std::vector<double> &distances, std::vector<Node<std::pair<double, int>>*>& pointers, std::vector<std::pair<double,int>>& bundle_parents) {
     randomized_comparison_counter++;
     if (new_dist < distances[node_num]) {
         distances[node_num] = new_dist;
         randomized_comparison_counter++;
         if (R.find(node_num) != R.end()) {
             //use the pointer to decrease key
-            H.decreaseKey(pointers[node_num], {new_dist, node_num});
+            H.decreaseKey(pointers[node_num]->getHeapIdx(), {new_dist, node_num});
         } else {
             //relax the representative node
             double bundle_parent_dist = bundle_parents[node_num].first;
@@ -47,19 +47,19 @@ std::vector<double> BundleDijkstras(const std::unique_ptr<std::unordered_set<int
 
     size_t numNodes = graph.size();
     std::vector<double> distances(numNodes, std::numeric_limits<int>::max());
-    std::vector<node<std::pair<double, int>>*> pointers(numNodes);
+    std::vector<Node<std::pair<double, int>>*> pointers(numNodes);
     distances[src] = 0;
 
-    FibonacciHeap<std::pair<double, int>> H;
+    MinHeap<std::pair<double, int>> H(R.size());
     
     for (const int& node_num : R) {
-        node<std::pair<double, int>>* pointer = H.insert({distances[node_num],node_num});
+        Node<std::pair<double, int>>* pointer = H.insertKey({distances[node_num],node_num});
         pointers[node_num] = pointer;
     }
 
     randomized_comparison_counter++;
     while (!H.isEmpty()) {
-        auto [u_dist, u_num] = H.removeMinimum();
+        auto [u_dist, u_num] = H.extractMin().getValue();
         //phase 1
         for (const auto& [v_u_dist,v_num] : bundle_map[u_num]) {
             randomized_arithmetic_op_counter++;
